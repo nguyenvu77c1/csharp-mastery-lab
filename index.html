@@ -4944,12 +4944,14 @@ ${userCode}
 
   // DEBUG CODE WITH AI
   $("debugAiBtn").onclick = () => {
+    if (el.tutorPanel) el.tutorPanel.classList.add("open");
     const userCode = editor.value;
     const prompt = `Tôi đang chạy đoạn code C# này trong bài học "${lesson.title}":\n\n\`\`\`csharp\n${userCode}\n\`\`\`\n\nHãy phân tích và debug giúp tôi:\n1. Đoạn code này có lỗi biên dịch (Compilation error) hay lỗi logic nào không?\n2. Có nguy cơ tiềm ẩn về Deadlock, Memory Leak, Boxing hoặc Exception không?\n3. Hãy cung cấp phiên bản đã sửa hoàn chỉnh!`;
     sendChatMessage(prompt);
   };
 
   $("askAiAboutCodeBtn").onclick = () => {
+    if (el.tutorPanel) el.tutorPanel.classList.add("open");
     const userCode = editor.value;
     const prompt = `Đây là code của tôi trong bài học "${lesson.title}":\n\n\`\`\`csharp\n${userCode}\n\`\`\`\n\nHãy review code này giúp tôi theo chuẩn Senior C# Developer: chỉ ra ưu điểm, lỗi tiềm ẩn và cách viết clean code hơn!`;
     sendChatMessage(prompt);
@@ -5315,6 +5317,11 @@ function appendChatMessage(role, text, metaInfo = "") {
 async function sendChatMessage(overridePrompt) {
   const text = (overridePrompt || el.chatInput.value).trim();
   if (!text) return;
+
+  // Luôn mở cửa sổ chat pop-up khi có tương tác AI
+  if (el.tutorPanel) {
+    el.tutorPanel.classList.add("open");
+  }
 
   appendChatMessage("user", text, "Bạn");
   el.chatInput.value = "";
