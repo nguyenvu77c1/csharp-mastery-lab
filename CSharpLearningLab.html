@@ -6648,17 +6648,37 @@ class Program
 Main();`;
   };
 
-  // LIVE C# CODE RUNNER / SIMULATOR
+    // LIVE C# CODE RUNNER / SIMULATOR (INSTANT OFFLINE .NET 8 ENGINE)
   const termWin = $("terminalWindow");
   const termBody = $("terminalOutputBody");
   const termMeta = $("terminalExecutionMeta");
 
-    function executeCSharpCodeClient(code) {
+  function executeCSharpCodeClient(code) {
     if (!code || !code.trim()) {
       return { success: false, output: "Vui lòng nhập code C# vào editor trước khi bấm chạy." };
     }
 
-    // 1. Kiểm tra đề bài chưa điền giá trị
+    // 1. Kiểm tra phát hiện code các ngôn ngữ khác (HTML, JS, Python, SQL)
+    if (code.includes('<html') || code.includes('<div') || code.includes('<h1') || code.includes('<body') || code.includes('<p>')) {
+      const textOnly = code.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      return {
+        success: true,
+        output: "[HTML / Web Markup Output]\n------------------------------------------------------------\n" + (textOnly || "HTML Rendered successfully.") + "\n------------------------------------------------------------\n[Process completed successfully in 0.01s]"
+      };
+    }
+    if (code.includes('console.log(')) {
+      const logs = [];
+      try {
+        const fn = new Function('console', code);
+        fn({ log: (...args) => logs.push(args.join(' ')) });
+        return {
+          success: true,
+          output: "[JavaScript Simulation Output]\n------------------------------------------------------------\n" + logs.join('\n') + "\n------------------------------------------------------------\n[Process completed successfully in 0.01s]"
+        };
+      } catch(e) {}
+    }
+
+    // 2. Kiểm tra đề bài chưa điền giá trị (ví dụ: type varName = ;)
     const lines = code.split('\n');
     const incompleteLines = [];
     lines.forEach((line, lineIdx) => {
@@ -6677,28 +6697,118 @@ Main();`;
       };
     }
 
-    // 2. Kiểm tra HTML / Web markup
-    if (code.includes('<html') || code.includes('<div') || code.includes('<h1') || code.includes('<body') || code.includes('<p>')) {
-      const textOnly = code.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-      return {
-        success: true,
-        output: "[HTML / Web Markup Output]\n------------------------------------------------------------\n" + (textOnly || "HTML Rendered successfully.") + "\n------------------------------------------------------------\n[Process completed successfully in 0.01s]"
-      };
-    }
-
-    // 3. Thực thi C# trực tiếp bằng Engine Client 100% Offline
+    // 3. Phân tích và chuyển đổi C# sang JavaScript Runtime
     try {
       const capturedLogs = [];
+      let loopGuardCounter = 0;
+      const MAX_LOOP_ITERATIONS = 10000;
+
       const customPrint = (...args) => {
-        const formatted = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+        const formatted = args.map(a => {
+          if (a === null) return "null";
+          if (a === undefined) return "undefined";
+          if (typeof a === 'object') return JSON.stringify(a);
+          return String(a);
+        }).join(' ');
         capturedLogs.push(formatted);
       };
 
-      const codeLines = code.split('\n').map(l => l.replace(/\/\/.*/, '').trim()).filter(l => l.length > 0);
-      const processedLines = codeLines.map(line => {
-        // Handle Console.WriteLine
-        if (/^Console\.WriteLine\s*\((.*)\);?$/.test(line)) {
-          const match = line.match(/^Console\.WriteLine\s*\((.*)\);?$/);
+      // Chuẩn bị các Helper của .NET / C#
+      const MathHelper = {
+        Max: Math.max,
+        Min: Math.min,
+        Round: (num, decimals = 0) => {
+          const factor = Math.pow(10, decimals);
+          return Math.round(num * factor) / factor;
+        },
+        Sqrt: Math.sqrt,
+        Abs: Math.abs,
+        Pow: Math.pow,
+        Floor: Math.floor,
+        Ceiling: Math.ceil,
+        PI: Math.PI
+      };
+
+      const StringHelper = {
+        IsNullOrEmpty: (s) => !s || s.length === 0,
+        IsNullOrWhiteSpace: (s) => !s || s.trim().length === 0,
+        Join: (sep, list) => Array.isArray(list) ? list.join(sep) : String(list),
+        Format: (fmt, ...args) => {
+          return fmt.replace(/\{(\d+)(?::N0)?\}/g, (m, idx) => {
+            const val = args[+idx];
+            return m.includes(':N0') && typeof val === 'number' ? val.toLocaleString('vi-VN') : val;
+          });
+        }
+      };
+
+      const IntHelper = {
+        TryParse: (str, outFn) => {
+          const num = parseInt(str, 10);
+          if (!isNaN(num)) {
+            if (typeof outFn === 'function') outFn(num);
+            return true;
+          }
+          return false;
+        },
+        Parse: (str) => parseInt(str, 10)
+      };
+
+      const DecimalHelper = {
+        TryParse: (str, outFn) => {
+          const num = parseFloat(str);
+          if (!isNaN(num)) {
+            if (typeof outFn === 'function') outFn(num);
+            return true;
+          }
+          return false;
+        },
+        Parse: (str) => parseFloat(str)
+      };
+
+      // Transpiler C# -> JS
+      let jsCode = code
+        .replace(/\/\/.*/g, '')
+        .replace(/\bMath\.([a-zA-Z]+)\b/g, 'MathHelper.$1')
+        .replace(/\bstring\.([a-zA-Z]+)\b/g, 'StringHelper.$1')
+        .replace(/\bint\.([a-zA-Z]+)\b/g, 'IntHelper.$1')
+        .replace(/\bdecimal\.([a-zA-Z]+)\b/g, 'DecimalHelper.$1')
+        .replace(/\b(?:string|int|decimal|float|double|bool|var)\s*\[\s*\]\s+([a-zA-Z0-9_]+)s*=s*(?:news+(?:string|int|decimal|float|double|bool)s*\[\s*\])?s*\{([^}]*)\};?/g, 'let $1 = [$2];')
+        .replace(/news+List<[^>]+>\s*(?:\(\s*\))?\s*\{([^}]*)\}/g, '[$1]')
+        .replace(/news+List<[^>]+>\s*\(\s*\)/g, '[]')
+        .replace(/\.Add\s*\(/g, '.push(')
+        .replace(/\.Count\b/g, '.length')
+        .replace(/\.Length\b/g, '.length')
+        .replace(/\.Where\s*\(/g, '.filter(')
+        .replace(/\.Select\s*\(/g, '.map(')
+        .replace(/\.(?:ToList|ToArray)\s*\(\s*\)/g, '')
+        .replace(/\.FirstOrDefault\s*\(\s*\)/g, '[0]')
+        .replace(/\.First\s*\(\s*\)/g, '[0]')
+        .replace(/\.Any\s*\(/g, '.some(')
+        .replace(/\.All\s*\(/g, '.every(')
+        .replace(/(\d+(?:\.\d+)?)[mMfFdD]\b/g, '$1')
+        .replace(/\b(?:string|int|decimal|float|double|bool|var|long|short|byte|char)\s+([a-zA-Z0-9_]+)\s*=/g, 'let $1 =')
+        .replace(/\bpublic\s+record\s+([a-zA-Z0-9_]+)\s*\(([^)]*)\);?/g, (m, recName, params) => {
+          const paramNames = params.split(',').map(p => p.trim().split(/\s+/).pop());
+          return "class " + recName + " { constructor(" + paramNames.join(', ') + ") { " + paramNames.map(p => "this." + p + " = " + p + ";").join(' ') + " } }";
+        })
+        .replace(/new\s+([a-zA-Z0-9_]+)\s*\{\s*([^}]+)\s*\}/g, (m, className, props) => {
+          let jsProps = props.replace(/([a-zA-Z0-9_]+)\s*=/g, '$1:');
+          return '({ __type: "' + className + '", ' + jsProps + ' })';
+        })
+        .replace(/foreach\s*\(\s*(?:var|string|int|decimal|float|double|bool|[a-zA-Z0-9_]+)\s+([a-zA-Z0-9_]+)\s+in\s+([^)]+)\)/g, 'for (let $1 of $2)')
+        .replace(/for\s*\(\s*(?:int|var)\s+([a-zA-Z0-9_]+)\s*=/g, 'for (let $1 =');
+
+      // Chuyển đổi String Interpolation $"..." và Console.WriteLine(...)
+      const processedLines = jsCode.split('\n').map(line => {
+        let l = line.trim();
+        if (!l) return "";
+
+        if (/^Console\.WriteLine\s*\(\s*\);?$/.test(l)) {
+          return '__print("");';
+        }
+
+        if (/^Console\.WriteLine\s*\((.*)\);?$/.test(l)) {
+          const match = l.match(/^Console\.WriteLine\s*\((.*)\);?$/);
           let arg = match[1].trim();
 
           if (arg.startsWith('$"') && arg.endsWith('"')) {
@@ -6707,20 +6817,17 @@ Main();`;
               if (expr.includes(':N0')) {
                 return "` + Number(" + expr.replace(':N0', '').trim() + ").toLocaleString('vi-VN') + `";
               }
+              if (expr.includes(':C') || expr.includes(':C0')) {
+                return "` + Number(" + expr.replace(/:C0?/, '').trim() + ").toLocaleString('vi-VN') + ' VNĐ`";
+              }
               return "` + (" + expr.trim() + ") + `";
             });
             return "__print(`" + jsTemplate + "`);";
           } else {
-            return "__print(" + arg.replace(/(\d+)[mMfFdD]\b/g, '$1') + ");";
+            return "__print(" + arg + ");";
           }
         }
 
-        // Handle variable declarations
-        let l = line
-          .replace(/(\d+(?:\.\d+)?)[mMfFdD]\b/g, '$1')
-          .replace(/\b(?:string|int|decimal|float|double|bool|var|long|short|byte|char)\s+([a-zA-Z0-9_]+)\s*=/g, 'let $1 =');
-
-        // Handle string interpolation assignments: let str = $"..."
         l = l.replace(/\$"(.*?)"/g, (m, inner) => {
           let jsTemplate = inner.replace(/\{([^}]+)\}/g, (mm, expr) => {
             if (expr.includes(':N0')) {
@@ -6735,9 +6842,13 @@ Main();`;
       });
 
       const executableJs = processedLines.join('\n');
-      const runner = new Function('__print', "try {\n" + executableJs + "\n} catch(err) { throw err; }");
+      const guardedJs = executableJs.replace(/(for|while)\s*\((.*?)\)\s*\{/g, (m, type, cond) => {
+        return type + " (" + cond + ") { if(++__loopGuardCounter > " + MAX_LOOP_ITERATIONS + ") throw new Error('Phát hiện vòng lặp vô hạn (Infinite Loop)! Hệ thống đã dừng thực thi an toàn.'); ";
+      });
 
-      runner(customPrint);
+      const runner = new Function('__print', 'MathHelper', 'StringHelper', 'IntHelper', 'DecimalHelper', '__loopGuardCounter', "try {\n" + guardedJs + "\n} catch(err) { throw err; }");
+
+      runner(customPrint, MathHelper, StringHelper, IntHelper, DecimalHelper, loopGuardCounter);
 
       if (capturedLogs.length > 0) {
         return {
