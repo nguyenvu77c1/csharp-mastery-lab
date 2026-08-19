@@ -5176,59 +5176,67 @@ function getOfflineAiResponse(question, lesson) {
 }
 
 /* ==========================================================================
-   CALL GEMINI API (WITH SMART MULTI-KEY ROTATION & MULTI-TURN MEMORY)
+   CALL GEMINI API (WITH SMART MULTI-KEY ROTATION & AUTO-MODEL FALLBACK)
    ========================================================================== */
 async function callGeminiApi(promptText, currentLesson) {
-  const maxAttempts = Math.max(state.apiKeys.length, 1);
-  let attempt = 0;
+  // Lấy danh sách model hợp lệ theo thứ tự ưu tiên
+  const candidateModels = [
+    state.selectedModel || "gemini-2.5-flash",
+    "gemini-2.5-flash",
+    "gemini-1.5-flash-latest",
+    "gemini-2.5-pro",
+    "gemini-3.6-flash"
+  ];
+  // Loại bỏ model trùng lặp
+  const modelsToTry = [...new Set(candidateModels)];
 
-  // Lấy code hiện tại trong editor để AI có đầy đủ ngữ cảnh
+  // Lấy code hiện tại trong editor
   const currentEditorCode = $("practiceCodeEditor") ? $("practiceCodeEditor").value.trim() : "";
 
   const systemInstructionText = `Bạn là Giảng viên C# & .NET kiêm Chuyên gia Khai phóng Năng lực Lập trình C# xuất sắc.
-HỌC VIÊN CỦA BẠN: Là lập trình viên đang chuyển từ "Vibe Coding" (trước đây chủ yếu dùng AI sinh code mà chưa nắm chắc code thuần) sang học và làm chủ C# thuần từ con số 0 để làm các dự án thực chiến (WinForms, ASP.NET Core, K2POS).
-
+HỌC VIÊN CỦA BẠN: Là lập trình viên đang chuyển từ "Vibe Coding" sang học và làm chủ C# thuần từ con số 0.
 BÀI HỌC HIỆN TẠI: "${currentLesson.title}" (Module: ${currentLesson.module}).
 - Mục tiêu: ${currentLesson.goals.join("; ")}
 - Tóm tắt cốt lõi: ${currentLesson.explain.join("; ")}
 - Ví dụ đời thực: ${currentLesson.analogy}
 ${currentEditorCode ? `- Đoạn Code học viên đang mở trong Editor:\n\`\`\`csharp\n${currentEditorCode}\n\`\`\`` : ''}
 
-NGUYÊN TẮC GIẢNG BÀI BẮT BUỘC:
-1. Giảng giải CỰC KỲ CƠ BẢN, CHI TIẾT VÀ DỄ HIỂU:
-   - Khi giải thích code, hãy bóc tách TỪNG TỪ KHÓA cú pháp (tại sao phải có 'public', 'private', 'static', 'void', 'get; set;', 'new', 'async', 'Task', 'class', 'struct').
-   - Đừng nhảy cóc hay dùng thuật ngữ hàn lâm khó hiểu mà không giải nghĩa cặn kẽ.
-2. Luôn liên hệ ví dụ đời thường gần gũi hoặc nghiệp vụ thực tế (Bán hàng, Quản lý kho, Đơn hàng, Menu quán cà phê POS).
-3. Chỉ ra bản chất bên dưới: Máy tính và bộ nhớ (Stack / Heap / CPU / CLR) đang làm gì khi dòng code đó chạy.
-4. Nêu rõ: "Người quen Vibe Coding hay sai ở điểm nào?" và "Cách tư duy của Senior C# khi tự tay gõ đoạn code này là gì?".
-5. Luôn trả lời bằng tiếng Việt thân thiện, khuyến khích, có định dạng Markdown đẹp mắt với code snippets C# chuẩn Clean Code.`;
+NGUYÊN TẮC GIẢNG BÀI:
+1. Giải thích CỰC KỲ CƠ BẢN, CHI TIẾT, BÓC TÁCH TỪNG TỪ KHÓA cú pháp C#.
+2. Luôn liên hệ ví dụ đời thường và nghiệp vụ thực tế (Bán hàng, K2POS, Đơn hàng).
+3. Chỉ ra bản chất bên dưới (Stack / Heap / CPU / CLR).
+4. Trả lời bằng tiếng Việt thân thiện, Markdown đẹp mắt, chuẩn Clean Code.`;
 
-  // Chuẩn bị payload multi-turn history (tối đa 6 lượt chat gần nhất để tránh quá tải token)
+  // Chuẩn bị payload history
   const historyContents = [];
   const recentHistory = state.chatHistory.slice(-6);
-  
   for (const h of recentHistory) {
     historyContents.push({
       role: h.role === 'user' ? 'user' : 'model',
       parts: [{ text: h.text }]
     });
   }
-
-  // Thêm tin nhắn hiện tại
   historyContents.push({
     role: "user",
     parts: [{ text: promptText }]
   });
 
-  while (attempt < maxAttempts) {
-    const keyInfo = getNextAvailableKey();
-    if (!keyInfo) {
-      // No keys available or all in cooldown
-      return { ok: false, mode: 'offline', text: getOfflineAiResponse(promptText, currentLesson) };
-    }
+  const availableKeys = state.apiKeys.filter(k => k.status !== 'error');
+  if (availableKeys.length === 0) {
+    return { 
+      ok: false, 
+      mode: 'offline', 
+      text: `⚠️ **Chưa có API Key hợp lệ nào!**\n\nBạn hãy bấm vào nút **\`AI Key\`** ở góc trên bên phải để thêm API Key Gemini mới. Nếu bạn vừa tạo key, hãy dán vào ô và bấm **Lưu cấu hình** nhé!\n\n---\n\n${getOfflineAiResponse(promptText, currentLesson)}` 
+    };
+  }
+
+  let lastErrorDetail = "";
+
+  for (const model of modelsToTry) {
+    let keyInfo = getNextAvailableKey();
+    if (!keyInfo) break;
 
     const { keyObj } = keyInfo;
-    const model = state.selectedModel || "gemini-2.0-flash";
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyObj.key}`;
 
     try {
@@ -5250,39 +5258,85 @@ NGUYÊN TẮC GIẢNG BÀI BẮT BUỘC:
       });
 
       if (res.status === 429) {
-        console.warn(`Key ${keyObj.key.slice(0, 8)} bị 429 Quota Exceeded. Đang xoay vòng sang key tiếp theo...`);
+        console.warn(`Key ${keyObj.key.slice(0, 8)} bị 429 Quota Exceeded. Đổi key...`);
         markKeyCooldown(keyObj, 60);
-        attempt++;
+        lastErrorDetail = "429: Hết hạn mức request (Quota Exceeded)";
         continue;
       }
 
-      if (res.status === 400 || res.status === 403) {
-        console.error(`Key ${keyObj.key.slice(0, 8)} không hợp lệ (Status ${res.status}).`);
+      if (res.status === 403) {
+        const errJson = await res.json().catch(() => ({}));
+        const msg = errJson.error?.message || "Permission Denied / Leaked Key";
+        console.error(`Key ${keyObj.key.slice(0, 8)} bị 403:`, msg);
         markKeyError(keyObj);
-        attempt++;
+        lastErrorDetail = `403: ${msg}`;
+        continue;
+      }
+
+      if (res.status === 404) {
+        console.warn(`Model ${model} không khả dụng (404). Đang tự động đổi sang model khác...`);
+        lastErrorDetail = `404: Model ${model} không khả dụng`;
         continue;
       }
 
       if (!res.ok) {
-        throw new Error(`HTTP Error ${res.status}`);
+        // Thử lại dạng fallback payload (gộp system instruction vào contents nếu API không nhận)
+        const fallbackPayload = {
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: `[HƯỚNG DẪN HỆ THỐNG]:\n${systemInstructionText}\n\n[CÂU HỎI]:\n${promptText}` }]
+            }
+          ]
+        };
+
+        const resFallback = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(fallbackPayload)
+        });
+
+        if (resFallback.ok) {
+          const dataFallback = await resFallback.json();
+          const generatedText = dataFallback.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (generatedText) {
+            state.selectedModel = model;
+            localStorage.setItem("csharp_gemini_model", model);
+            state.chatHistory.push({ role: 'user', text: promptText });
+            state.chatHistory.push({ role: 'model', text: generatedText });
+            markKeySuccess(keyObj);
+            return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
+          }
+        }
+
+        const errData = await res.json().catch(() => ({}));
+        lastErrorDetail = `HTTP ${res.status}: ${errData.error?.message || 'Lỗi kết nối'}`;
+        continue;
       }
 
       const data = await res.json();
       const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi từ AI.";
 
-      // Lưu lại vào lịch sử hội thoại
+      // Cập nhật model thành công
+      state.selectedModel = model;
+      localStorage.setItem("csharp_gemini_model", model);
+
       state.chatHistory.push({ role: 'user', text: promptText });
       state.chatHistory.push({ role: 'model', text: generatedText });
 
       markKeySuccess(keyObj);
       return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
     } catch (err) {
-      console.error("Gemini API call failed:", err);
-      attempt++;
+      console.error("Gemini API call error:", err);
+      lastErrorDetail = err.message;
     }
   }
 
-  return { ok: false, mode: 'offline', text: getOfflineAiResponse(promptText, currentLesson) };
+  return { 
+    ok: false, 
+    mode: 'offline', 
+    text: `⚠️ **Không thể kết nối với Gemini API (${lastErrorDetail || 'Lỗi không xác định'})**\n\n*Gợi ý khắc phục:*\n1. Bấm vào nút **\`AI Key\`** ở góc trên bên phải.\n2. Kiểm tra xem mã API Key của bạn đã được dán chính xác chưa.\n3. Bấm **\`⚡ Kiểm tra tất cả Keys\`** để kiểm tra trạng thái.\n\n---\n\n${getOfflineAiResponse(promptText, currentLesson)}` 
+  };
 }
 
 /* ==========================================================================
@@ -5336,7 +5390,7 @@ async function sendChatMessage(overridePrompt) {
   if (result.mode === 'online') {
     appendChatMessage("assistant", result.text, `🤖 Gemini • Key [${result.keyMasked}]`);
   } else {
-    appendChatMessage("assistant", result.text, `⚡ Trợ lý C# Offline`);
+    appendChatMessage("assistant", result.text, `⚡ Trợ lý C#`);
   }
 }
 
@@ -5369,25 +5423,40 @@ async function testAllKeys() {
   el.testKeysBtn.disabled = true;
   el.testKeysBtn.textContent = "Đang kiểm tra...";
 
-  for (const k of state.apiKeys) {
-    try {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${state.selectedModel}:generateContent?key=${k.key}`;
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: "Hello" }] }] })
-      });
+  const modelsToTest = [state.selectedModel || "gemini-2.5-flash", "gemini-2.5-flash", "gemini-1.5-flash-latest", "gemini-2.5-pro"];
 
-      if (res.ok) {
-        k.status = 'ready';
-        k.cooldownUntil = 0;
-      } else if (res.status === 429) {
-        k.status = 'cooldown';
-        k.cooldownUntil = Date.now() + 60000;
-      } else {
+  for (const k of state.apiKeys) {
+    let keyWorking = false;
+    for (const m of [...new Set(modelsToTest)]) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k.key}`;
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contents: [{ parts: [{ text: "Hello" }] }] })
+        });
+
+        if (res.ok) {
+          k.status = 'ready';
+          k.cooldownUntil = 0;
+          state.selectedModel = m;
+          el.modelSelect.value = m;
+          keyWorking = true;
+          break;
+        } else if (res.status === 429) {
+          k.status = 'cooldown';
+          k.cooldownUntil = Date.now() + 60000;
+          keyWorking = true;
+          break;
+        } else if (res.status === 403) {
+          k.status = 'error';
+          break;
+        }
+      } catch {
         k.status = 'error';
       }
-    } catch {
+    }
+    if (!keyWorking && k.status !== 'cooldown') {
       k.status = 'error';
     }
   }
