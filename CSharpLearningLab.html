@@ -2213,7 +2213,270 @@ pre[class*="language-"] {
 }
 
 
-  </style>
+  
+/* ==========================================================================
+   VISUAL INFOGRAPHICS, MODERN C# REFRESHER & MOBILE TOUCH ENHANCEMENTS
+   ========================================================================== */
+.lesson-infographic-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+.lesson-infographic-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 10px;
+}
+.lesson-infographic-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: #e0e7ff;
+}
+.infographic-pill {
+  font-size: 10.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  color: #ffffff;
+}
+.infographic-img-container {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  background: #030712;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+.infographic-img-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+.infographic-caption {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── DIAGRAM GRID & MENTAL MODEL BOXES ── */
+.diagram-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.diagram-col {
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.diagram-col:hover {
+  transform: translateY(-2px);
+}
+.diagram-col.accent { border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.06); }
+.diagram-col.cyan { border-color: rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.06); }
+.diagram-col.warning { border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.06); }
+.diagram-col.success { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.06); }
+.diagram-col.purple { border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.06); }
+
+.diagram-col-title {
+  font-size: 13px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink);
+}
+.diagram-col-body {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ── MODERN C# VS CLASSIC C# REFRESHER CARD ── */
+.modern-diff-card {
+  background: var(--panel-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.modern-diff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.modern-diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 768px) {
+  .modern-diff-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+.diff-col {
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 12.5px;
+}
+.diff-col.classic {
+  background: rgba(244, 63, 94, 0.06);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+.diff-col.modern {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.diff-col-title {
+  font-weight: 800;
+  font-size: 12.5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.diff-col.classic .diff-col-title { color: #fb7185; }
+.diff-col.modern .diff-col-title { color: #34d399; }
+.diff-col pre {
+  margin: 8px 0 0 !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+  background: #020617 !important;
+}
+
+/* ── OVERALL MOBILE LAYOUT OPTIMIZATION (100% RESPONSIVE) ── */
+@media (max-width: 900px) {
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+  }
+  .topbar {
+    height: 52px !important;
+    padding: 0 8px !important;
+  }
+  .main-content {
+    margin-left: 0 !important;
+    margin-top: 52px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 12px 10px 90px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  .content-wrapper {
+    max-width: 100% !important;
+    width: 100% !important;
+    gap: 14px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+  .hero-card, .section-card, .lesson-infographic-card, .modern-diff-card, .key-takeaway-card {
+    padding: 14px 12px !important;
+    border-radius: 14px !important;
+  }
+  .hero-title {
+    font-size: 18px !important;
+    line-height: 1.35 !important;
+  }
+  
+  /* GRID 2 CỘT CHO CỤM NÚT TRÊN MOBILE */
+  .btn-group {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+  .btn-group button {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px 8px !important;
+    font-size: 12px !important;
+    justify-content: center !important;
+    min-height: 44px !important;
+  }
+  #runCodeLiveBtn {
+    grid-column: 1 / -1 !important;
+    padding: 12px 14px !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    min-height: 48px !important;
+  }
+  #debugAiBtn {
+    margin-left: 0 !important;
+  }
+
+  /* CHAT AI BOTTOM SHEET TRÊN MOBILE */
+  .tutor-panel {
+    position: fixed !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: min(85dvh, 580px) !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.9) !important;
+    z-index: 100000 !important;
+    transform: translateY(115%) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: flex !important;
+  }
+  .tutor-panel.open {
+    transform: translateY(0) !important;
+  }
+  
+  .floating-ai-btn {
+    bottom: 16px !important;
+    right: 14px !important;
+    width: auto !important;
+    height: 44px !important;
+    padding: 0 16px !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+    gap: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6) !important;
+  }
+}
+
+</style>
 </head>
 <body>
   <div class="app-layout">
@@ -2660,6 +2923,34 @@ window.LESSONS = [
   /* ---------------- MODULE 0: NHẬP MÔN & CÚ PHÁP C# NỀN TẢNG (TỪ SỐ 0) ---------------- */
   {
     id: "csharp-variables-types",
+    image: "assets/infographics/csharp-variables-types.jpg",
+    diagrams: [
+      {
+            "icon": "📦",
+            "title": "int (Số nguyên)",
+            "desc": "Ô nhớ 32-bit chứa số lượng (1, 2, 50). Không có số thập phân.",
+            "color": "accent"
+      },
+      {
+            "icon": "💰",
+            "title": "decimal (Tiền tệ)",
+            "desc": "Két sắt 128-bit kết thúc bằng chữ 'm' (35000m). Tuyệt đối không dùng float/double tính tiền vì sẽ sai số.",
+            "color": "warning"
+      },
+      {
+            "icon": "🛡️",
+            "title": "int.TryParse()",
+            "desc": "Bộ lọc ép kiểu an toàn: Kiểm tra chuỗi trước khi chuyển thành số, giúp chương trình không bao giờ Crash.",
+            "color": "cyan"
+      }
+],
+    modernDiff: {
+      "classicCode": "// C# Ngày xưa (Classic C# 1-6)\nint quantity = 5;\nstring name = \"Cà phê sữa\";\ndecimal price = 25000.0m;\nstring info = string.Format(\"Món: {0}, Giá: {1}\", name, price);",
+      "modernCode": "// C# Hiện đại (C# 10/12/13)\nvar quantity = 5;\nvar name = \"Cà phê sữa\";\nvar price = 25_000m; // Phân cách chữ số dễ đọc\nvar info = $\"Món: {name}, Giá: {price:N0} VNĐ\"; // String Interpolation",
+      "classicNote": "Khai báo kiểu lặp lại, format chuỗi bằng index dễ nhầm lẫn",
+      "modernNote": "Từ khóa var tự suy luận kiểu, cú pháp $\"{var}\" cực kỳ trong sáng",
+      "benefit": "Giảm 50% số ký tự gõ phím, code trực quan và loại bỏ hoàn toàn lỗi gõ nhầm index format."
+},
     module: "0. C# Nhập môn & Cú pháp Cơ bản",
     title: "Biến, Kiểu dữ liệu, Ép kiểu & Toán tử trong C#",
     minutes: 20,
@@ -2743,6 +3034,33 @@ decimal total = quantity * price;`
   },
   {
     id: "csharp-control-flow",
+    diagrams: [
+      {
+            "icon": "🔀",
+            "title": "If / Else If / Else",
+            "desc": "Ngã ba đường logic: Rẽ nhánh theo điều kiện True/False từ trên xuống dưới.",
+            "color": "accent"
+      },
+      {
+            "icon": "⚡",
+            "title": "Switch Expression",
+            "desc": "Bảng tra cứu pattern matching siêu gọn: `status switch { 'Paid' => ..., _ => ... }`.",
+            "color": "cyan"
+      },
+      {
+            "icon": "🔁",
+            "title": "Foreach Loop",
+            "desc": "Người kiểm kho: Duyệt tuần tự từng phần tử trong danh sách an toàn, không lo tràn chỉ mục index.",
+            "color": "success"
+      }
+],
+    modernDiff: {
+      "classicCode": "// C# Cổ điển (switch case cồng kềnh)\nstring statusDesc = \"\";\nswitch (orderStatus) {\n    case \"Pending\":\n        statusDesc = \"Chờ xử lý\";\n        break;\n    case \"Paid\":\n        statusDesc = \"Đã thanh toán\";\n        break;\n    default:\n        statusDesc = \"Không xác định\";\n        break;\n}",
+      "modernCode": "// C# Hiện đại (Switch Expression)\nvar statusDesc = orderStatus switch {\n    \"Pending\" => \"Chờ xử lý\",\n    \"Paid\"    => \"Đã thanh toán\",\n    _         => \"Không xác định\"\n};",
+      "classicNote": "Phải dùng break liên tục, dễ quên break gây lỗi logic ngầm",
+      "modernNote": "Trả về giá trị trực tiếp như một biểu thức biểu cảm, gọn hơn 70%",
+      "benefit": "Loại bỏ hoàn toàn boilerplate case/break, dễ đọc và an toàn tuyệt đối."
+},
     module: "0. C# Nhập môn & Cú pháp Cơ bản",
     title: "Cấu trúc Điều khiển: If/Else, Switch, For & Foreach",
     minutes: 25,
@@ -2825,6 +3143,33 @@ foreach (int score in scores)
   },
   {
     id: "csharp-methods-functions",
+    diagrams: [
+      {
+            "icon": "⚙️",
+            "title": "Hàm (Method)",
+            "desc": "Khối lệnh có tên: Nhận tham số đầu vào -> Xử lý nghiệp vụ -> Trả về kết quả (return).",
+            "color": "accent"
+      },
+      {
+            "icon": "🚫",
+            "title": "void",
+            "desc": "Hàm hành động (in log, gửi email, phát chuông) không cần trả về giá trị.",
+            "color": "purple"
+      },
+      {
+            "icon": "🎯",
+            "title": "Single Responsibility",
+            "desc": "Mỗi hàm chỉ làm đúng 1 việc duy nhất để dễ bảo trì và unit test.",
+            "color": "success"
+      }
+],
+    modernDiff: {
+      "classicCode": "// C# Ngày xưa\npublic decimal CalculateTotal(int qty, decimal price) {\n    return qty * price;\n}",
+      "modernCode": "// C# Hiện đại (Expression-Bodied Method)\npublic decimal CalculateTotal(int qty, decimal price) => qty * price;",
+      "classicNote": "Hàm 1 dòng vẫn phải mở ngoặc nhọn { return ...; }",
+      "modernNote": "Dùng toán tử mũi tên => viết hàm 1 dòng cực gọn gàng",
+      "benefit": "Code thanh thoát, dễ đọc khi viết các hàm tính toán đơn giản."
+},
     module: "0. C# Nhập môn & Cú pháp Cơ bản",
     title: "Phương thức (Methods / Functions) & Cách tái sử dụng mã nguồn",
     minutes: 25,
@@ -5517,6 +5862,99 @@ function renderSidebar(searchQuery = "") {
 /* ==========================================================================
    RENDER CURRENT LESSON CONTENT
    ========================================================================== */
+
+/* ==========================================================================
+   RENDER INFOGRAPHIC & MODERN C# DIFF ENGINE
+   ========================================================================== */
+function renderVisualInfographic(l) {
+  let imageHtml = '';
+  if (l.image) {
+    imageHtml = `
+      <div class="infographic-img-container">
+        <img src="${escapeHtml(l.image)}" alt="Infographic ${escapeHtml(l.title)}" loading="lazy" />
+        <div class="infographic-caption">
+          <span>🔍</span>
+          <span><strong>Infographic Trực quan:</strong> Sơ đồ tóm tắt cơ chế cốt lõi của bài học (Biến, Bộ nhớ, Luồng chạy).</span>
+        </div>
+      </div>
+    `;
+  }
+
+  let diagramHtml = '';
+  if (l.diagrams && l.diagrams.length > 0) {
+    diagramHtml = `
+      <div class="diagram-grid">
+        ${l.diagrams.map(d => `
+          <div class="diagram-col ${escapeHtml(d.color || 'accent')}">
+            <div class="diagram-col-title">${escapeHtml(d.icon || '📌')} ${escapeHtml(d.title)}</div>
+            <div class="diagram-col-body">${escapeHtml(d.desc)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    // Generate intelligent dynamic concept cards if none explicitly defined
+    diagramHtml = `
+      <div class="diagram-grid">
+        <div class="diagram-col accent">
+          <div class="diagram-col-title">🎯 Bản chất cốt lõi</div>
+          <div class="diagram-col-body">${escapeHtml(l.goals[0] || l.short)}</div>
+        </div>
+        <div class="diagram-col cyan">
+          <div class="diagram-col-title">☕ Mô hình thực tế</div>
+          <div class="diagram-col-body">${escapeHtml(l.analogy || "Tư duy trực quan giúp nắm bản chất nhanh chóng.")}</div>
+        </div>
+        <div class="diagram-col warning">
+          <div class="diagram-col-title">⚡ Quy tắc 10 giây</div>
+          <div class="diagram-col-body">${escapeHtml(l.goals[1] || "Thực hành ngay với Live Terminal để nhớ lâu.")}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="lesson-infographic-card">
+      <div class="lesson-infographic-header">
+        <div class="lesson-infographic-title">
+          <span>📸</span>
+          <span>Sơ đồ Tóm tắt Trực quan & Mental Model</span>
+        </div>
+        <span class="infographic-pill">Visual Concept</span>
+      </div>
+      ${imageHtml}
+      ${diagramHtml}
+    </div>
+  `;
+}
+
+function renderModernDiff(l) {
+  if (!l.modernDiff) return '';
+  return `
+    <div class="modern-diff-card">
+      <div class="modern-diff-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span>⚡</span>
+          <span>C# Hiện đại (C# 10/12/13) vs C# Cổ điển (Dành cho người quay lại)</span>
+        </div>
+        <span class="badge-pill accent" style="font-size: 10.5px;">Modern Refresher</span>
+      </div>
+      <div class="modern-diff-grid">
+        <div class="diff-col classic">
+          <div class="diff-col-title">👴 C# Ngày xưa (Classic C#)</div>
+          <p style="margin: 0; color: var(--ink-soft); font-size: 12px;">${escapeHtml(l.modernDiff.classicNote || "Cú pháp dài dòng, nhiều boilerplate")}</p>
+          <pre><code class="language-csharp">${escapeHtml(l.modernDiff.classicCode)}</code></pre>
+        </div>
+        <div class="diff-col modern">
+          <div class="diff-col-title">✨ C# Hiện đại (Modern C#)</div>
+          <p style="margin: 0; color: var(--ink-soft); font-size: 12px;">${escapeHtml(l.modernDiff.modernNote || "Ngắn gọn, biểu cảm và an toàn hơn")}</p>
+          <pre><code class="language-csharp">${escapeHtml(l.modernDiff.modernCode)}</code></pre>
+        </div>
+      </div>
+      ${l.modernDiff.benefit ? `<div style="margin-top: 10px; font-size: 12.5px; color: var(--cyan); display: flex; align-items: center; gap: 6px;">💡 <strong>Lợi ích thực chiến:</strong> ${escapeHtml(l.modernDiff.benefit)}</div>` : ''}
+    </div>
+  `;
+}
+
 function renderLesson() {
   const l = getCurrentLesson();
   if (!l) return;
@@ -5565,6 +6003,12 @@ function renderLesson() {
       <h1 class="hero-title">${escapeHtml(l.title)}</h1>
       <p class="hero-desc">${escapeHtml(l.short)}</p>
     </section>
+
+    <!-- VISUAL INFOGRAPHIC & MENTAL MODEL -->
+    ${renderVisualInfographic(l)}
+
+    <!-- MODERN C# VS CLASSIC C# REFRESHER -->
+    ${renderModernDiff(l)}
 
     <!-- KEY TAKEAWAYS (30s REFRESHER BOX CHO NGƯỜI QUAY LẠI C#) -->
     <div class="key-takeaway-card">
