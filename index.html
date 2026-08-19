@@ -2645,10 +2645,10 @@ pre {
         <div class="key-input-area">
           <label><span>Chọn Model Gemini mặc định:</span></label>
           <select id="modelSelect" style="width: 100%; padding: 10px; border-radius: 8px; background: var(--bg-subtle); border: 1px solid var(--line); color: var(--ink);">
-            <option value="gemini-2.0-flash">gemini-2.0-flash (Khuyên dùng - Siêu nhanh & Thông minh)</option>
-            <option value="gemini-1.5-flash">gemini-1.5-flash (Nhanh, nhẹ)</option>
-            <option value="gemini-1.5-pro">gemini-1.5-pro (Suy luận sâu)</option>
-            <option value="gemini-2.5-flash">gemini-2.5-flash (Bản mới nhất)</option>
+            <option value="gemini-2.5-flash">gemini-2.5-flash (Khuyên dùng - Siêu nhanh & Thông minh)</option>
+            <option value="gemini-2.5-pro">gemini-2.5-pro (Suy luận sâu & Lập trình nâng cao)</option>
+            <option value="gemini-3.6-flash">gemini-3.6-flash (Thế hệ mới nhất)</option>
+            <option value="gemini-1.5-flash-latest">gemini-1.5-flash-latest (Ổn định)</option>
           </select>
         </div>
 
@@ -4462,7 +4462,7 @@ const state = {
     return [{ key: "AIzaSyCvzoQfvEq1Zfv29A_4O9A4YVLKTxZIaOU", status: "ready", cooldownUntil: 0, successCount: 0 }];
   })(),
   currentKeyIndex: 0,
-  selectedModel: localStorage.getItem("csharp_gemini_model") || "gemini-2.0-flash",
+  selectedModel: localStorage.getItem("csharp_gemini_model") || "gemini-2.5-flash",
   chatHistory: [] // current session chat messages
 };
 
