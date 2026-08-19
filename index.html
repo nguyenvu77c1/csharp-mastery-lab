@@ -4627,9 +4627,17 @@ function getOfflineAiResponse(question, lesson) {
 }
 
 /* ==========================================================================
-   CALL GEMINI API (WITH SMART MULTI-KEY ROTATION & AUTO-MODEL FALLBACK)
+   CALL GEMINI API (WITH SMART MULTI-KEY ROTATION, AUTO-RETRY & MULTI-MODEL FALLBACK)
    ========================================================================== */
+let lastFailedPrompt = "";
+
+async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function callGeminiApi(promptText, currentLesson) {
+  lastFailedPrompt = promptText;
+
   // Lấy danh sách model hợp lệ theo thứ tự ưu tiên
   const candidateModels = [
     state.selectedModel || "gemini-2.5-flash",
@@ -4638,7 +4646,6 @@ async function callGeminiApi(promptText, currentLesson) {
     "gemini-2.5-pro",
     "gemini-3.6-flash"
   ];
-  // Loại bỏ model trùng lặp
   const modelsToTry = [...new Set(candidateModels)];
 
   // Lấy code hiện tại trong editor
@@ -4690,109 +4697,126 @@ NGUYÊN TẮC GIẢNG BÀI:
     const { keyObj } = keyInfo;
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyObj.key}`;
 
-    try {
-      const payload = {
-        system_instruction: {
-          parts: [{ text: systemInstructionText }]
-        },
-        contents: historyContents,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 2500
-        }
-      };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.status === 429) {
-        console.warn(`Key ${keyObj.key.slice(0, 8)} bị 429 Quota Exceeded. Đổi key...`);
-        markKeyCooldown(keyObj, 60);
-        lastErrorDetail = "429: Hết hạn mức request (Quota Exceeded)";
-        continue;
-      }
-
-      if (res.status === 403) {
-        const errJson = await res.json().catch(() => ({}));
-        const msg = errJson.error?.message || "Permission Denied / Leaked Key";
-        console.error(`Key ${keyObj.key.slice(0, 8)} bị 403:`, msg);
-        markKeyError(keyObj);
-        lastErrorDetail = `403: ${msg}`;
-        continue;
-      }
-
-      if (res.status === 404) {
-        console.warn(`Model ${model} không khả dụng (404). Đang tự động đổi sang model khác...`);
-        lastErrorDetail = `404: Model ${model} không khả dụng`;
-        continue;
-      }
-
-      if (!res.ok) {
-        // Thử lại dạng fallback payload (gộp system instruction vào contents nếu API không nhận)
-        const fallbackPayload = {
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: `[HƯỚNG DẪN HỆ THỐNG]:\n${systemInstructionText}\n\n[CÂU HỎI]:\n${promptText}` }]
-            }
-          ]
+    // Auto-retry tối đa 2 lần cho mỗi model nếu máy chủ Google quá tải (503 / 429)
+    for (let retry = 0; retry < 2; retry++) {
+      try {
+        const payload = {
+          system_instruction: {
+            parts: [{ text: systemInstructionText }]
+          },
+          contents: historyContents,
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2500
+          }
         };
 
-        const resFallback = await fetch(endpoint, {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(fallbackPayload)
+          body: JSON.stringify(payload)
         });
 
-        if (resFallback.ok) {
-          const dataFallback = await resFallback.json();
-          const generatedText = dataFallback.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (generatedText) {
-            state.selectedModel = model;
-            localStorage.setItem("csharp_gemini_model", model);
-            state.chatHistory.push({ role: 'user', text: promptText });
-            state.chatHistory.push({ role: 'model', text: generatedText });
-            markKeySuccess(keyObj);
-            return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
-          }
+        if (res.status === 503 || res.status === 500) {
+          console.warn(`Model ${model} đang quá tải (Status ${res.status}). Đang tự động thử lại lần ${retry + 1}...`);
+          lastErrorDetail = `Máy chủ Google đang quá tải (${res.status})`;
+          await sleep(1000 * (retry + 1));
+          continue;
         }
 
-        const errData = await res.json().catch(() => ({}));
-        lastErrorDetail = `HTTP ${res.status}: ${errData.error?.message || 'Lỗi kết nối'}`;
-        continue;
+        if (res.status === 429) {
+          console.warn(`Key ${keyObj.key.slice(0, 8)} bị 429 Quota Exceeded. Đang xoay vòng sang key tiếp theo...`);
+          markKeyCooldown(keyObj, 60);
+          lastErrorDetail = "429: Hết hạn mức request (Quota Exceeded)";
+          break; // Đổi sang model / key tiếp theo
+        }
+
+        if (res.status === 403) {
+          const errJson = await res.json().catch(() => ({}));
+          const msg = errJson.error?.message || "Permission Denied / Leaked Key";
+          console.error(`Key ${keyObj.key.slice(0, 8)} bị 403:`, msg);
+          markKeyError(keyObj);
+          lastErrorDetail = `403: ${msg}`;
+          break; // Bỏ qua key bị lỗi
+        }
+
+        if (res.status === 404) {
+          console.warn(`Model ${model} không khả dụng (404). Chuyển sang model tiếp theo...`);
+          lastErrorDetail = `404: Model ${model} không khả dụng`;
+          break;
+        }
+
+        if (!res.ok) {
+          // Thử lại dạng fallback payload
+          const fallbackPayload = {
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: `[HƯỚNG DẪN HỆ THỐNG]:\n${systemInstructionText}\n\n[CÂU HỎI]:\n${promptText}` }]
+              }
+            ]
+          };
+
+          const resFallback = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(fallbackPayload)
+          });
+
+          if (resFallback.ok) {
+            const dataFallback = await resFallback.json();
+            const generatedText = dataFallback.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (generatedText) {
+              state.selectedModel = model;
+              localStorage.setItem("csharp_gemini_model", model);
+              state.chatHistory.push({ role: 'user', text: promptText });
+              state.chatHistory.push({ role: 'model', text: generatedText });
+              markKeySuccess(keyObj);
+              return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
+            }
+          }
+
+          const errData = await res.json().catch(() => ({}));
+          lastErrorDetail = `HTTP ${res.status}: ${errData.error?.message || 'Lỗi kết nối'}`;
+          continue;
+        }
+
+        const data = await res.json();
+        const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi từ AI.";
+
+        // Cập nhật model thành công
+        state.selectedModel = model;
+        localStorage.setItem("csharp_gemini_model", model);
+
+        state.chatHistory.push({ role: 'user', text: promptText });
+        state.chatHistory.push({ role: 'model', text: generatedText });
+
+        markKeySuccess(keyObj);
+        return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
+      } catch (err) {
+        console.error("Gemini API call network error:", err);
+        lastErrorDetail = "Rớt kết nối mạng hoặc timeout";
+        await sleep(800);
       }
-
-      const data = await res.json();
-      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi từ AI.";
-
-      // Cập nhật model thành công
-      state.selectedModel = model;
-      localStorage.setItem("csharp_gemini_model", model);
-
-      state.chatHistory.push({ role: 'user', text: promptText });
-      state.chatHistory.push({ role: 'model', text: generatedText });
-
-      markKeySuccess(keyObj);
-      return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
-    } catch (err) {
-      console.error("Gemini API call error:", err);
-      lastErrorDetail = err.message;
     }
   }
 
   return { 
     ok: false, 
     mode: 'offline', 
-    text: `⚠️ **Không thể kết nối với Gemini API (${lastErrorDetail || 'Lỗi không xác định'})**\n\n*Gợi ý khắc phục:*\n1. Bấm vào nút **\`AI Key\`** ở góc trên bên phải.\n2. Kiểm tra xem mã API Key của bạn đã được dán chính xác chưa.\n3. Bấm **\`⚡ Kiểm tra tất cả Keys\`** để kiểm tra trạng thái.\n\n---\n\n${getOfflineAiResponse(promptText, currentLesson)}` 
+    text: `⚠️ **Máy chủ AI đang tạm thời quá tải hoặc bận (${lastErrorDetail || 'Lỗi kết nối'})**\n\n<div style="margin-top: 10px;"><button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="window.retryLastChat()">🔄 Bấm vào đây để thử gửi lại ngay</button></div>\n\n---\n\n${getOfflineAiResponse(promptText, currentLesson)}` 
   };
 }
 
 /* ==========================================================================
    CHATBOT UI INTERACTIONS
    ========================================================================== */
+window.retryLastChat = function() {
+  if (lastFailedPrompt) {
+    sendChatMessage(lastFailedPrompt);
+  }
+};
+
 function appendChatMessage(role, text, metaInfo = "") {
   const msgEl = document.createElement("div");
   msgEl.className = `chat-msg ${role}`;
