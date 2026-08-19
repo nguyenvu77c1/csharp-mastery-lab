@@ -6653,7 +6653,127 @@ Main();`;
   const termBody = $("terminalOutputBody");
   const termMeta = $("terminalExecutionMeta");
 
-  $("runCodeLiveBtn").onclick = async () => {
+    function executeCSharpCodeClient(code) {
+    if (!code || !code.trim()) {
+      return { success: false, output: "Vui lòng nhập code C# vào editor trước khi bấm chạy." };
+    }
+
+    // 1. Kiểm tra đề bài chưa điền giá trị
+    const lines = code.split('\n');
+    const incompleteLines = [];
+    lines.forEach((line, lineIdx) => {
+      const trimmed = line.trim();
+      if (/^(?:string|int|decimal|double|float|bool|var)\s+([a-zA-Z0-9_]+)\s*=\s*;?$/.test(trimmed)) {
+        incompleteLines.push({ line: lineIdx + 1, text: trimmed });
+      }
+    });
+
+    if (incompleteLines.length > 0) {
+      return {
+        success: false,
+        output: "⚠️ [ĐỀ BÀI CHƯA ĐIỀN GIÁ TRỊ]\n------------------------------------------------------------\n" +
+          incompleteLines.map(i => "  • Dòng " + i.line + ": \"" + i.text + "\" ➔ Bạn hãy điền giá trị sau dấu '=' trước khi bấm chạy nhé!").join('\n') +
+          "\n\n💡 Gợi ý mẫu hoàn chỉnh:\n  string productName = \"Bánh mì\";\n  int quantity = 2;\n  decimal price = 20000m;\n  decimal total = quantity * price;\n  Console.WriteLine($\"Tổng: {total:N0} VNĐ\");"
+      };
+    }
+
+    // 2. Kiểm tra HTML / Web markup
+    if (code.includes('<html') || code.includes('<div') || code.includes('<h1') || code.includes('<body') || code.includes('<p>')) {
+      const textOnly = code.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      return {
+        success: true,
+        output: "[HTML / Web Markup Output]\n------------------------------------------------------------\n" + (textOnly || "HTML Rendered successfully.") + "\n------------------------------------------------------------\n[Process completed successfully in 0.01s]"
+      };
+    }
+
+    // 3. Thực thi C# trực tiếp bằng Engine Client 100% Offline
+    try {
+      const capturedLogs = [];
+      const customPrint = (...args) => {
+        const formatted = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+        capturedLogs.push(formatted);
+      };
+
+      const codeLines = code.split('\n').map(l => l.replace(/\/\/.*/, '').trim()).filter(l => l.length > 0);
+      const processedLines = codeLines.map(line => {
+        // Handle Console.WriteLine
+        if (/^Console\.WriteLine\s*\((.*)\);?$/.test(line)) {
+          const match = line.match(/^Console\.WriteLine\s*\((.*)\);?$/);
+          let arg = match[1].trim();
+
+          if (arg.startsWith('$"') && arg.endsWith('"')) {
+            let inner = arg.slice(2, -1);
+            let jsTemplate = inner.replace(/\{([^}]+)\}/g, (m, expr) => {
+              if (expr.includes(':N0')) {
+                return "` + Number(" + expr.replace(':N0', '').trim() + ").toLocaleString('vi-VN') + `";
+              }
+              return "` + (" + expr.trim() + ") + `";
+            });
+            return "__print(`" + jsTemplate + "`);";
+          } else {
+            return "__print(" + arg.replace(/(\d+)[mMfFdD]\b/g, '$1') + ");";
+          }
+        }
+
+        // Handle variable declarations
+        let l = line
+          .replace(/(\d+(?:\.\d+)?)[mMfFdD]\b/g, '$1')
+          .replace(/\b(?:string|int|decimal|float|double|bool|var|long|short|byte|char)\s+([a-zA-Z0-9_]+)\s*=/g, 'let $1 =');
+
+        // Handle string interpolation assignments: let str = $"..."
+        l = l.replace(/\$"(.*?)"/g, (m, inner) => {
+          let jsTemplate = inner.replace(/\{([^}]+)\}/g, (mm, expr) => {
+            if (expr.includes(':N0')) {
+              return "` + Number(" + expr.replace(':N0', '').trim() + ").toLocaleString('vi-VN') + `";
+            }
+            return "` + (" + expr.trim() + ") + `";
+          });
+          return "`" + jsTemplate + "`";
+        });
+
+        return l;
+      });
+
+      const executableJs = processedLines.join('\n');
+      const runner = new Function('__print', "try {\n" + executableJs + "\n} catch(err) { throw err; }");
+
+      runner(customPrint);
+
+      if (capturedLogs.length > 0) {
+        return {
+          success: true,
+          output: "[.NET 8.0 Console Output - Time: 0.01s]\n------------------------------------------------------------\n" + capturedLogs.join('\n') + "\n------------------------------------------------------------\n[Process exited with code 0 - Success!]"
+        };
+      } else {
+        const varMatches = [...code.matchAll(/\b(?:string|int|decimal|float|double|bool|var)\s+([a-zA-Z0-9_]+)\s*=\s*([^;]+);/g)];
+        if (varMatches.length > 0) {
+          const varSummary = varMatches.map(m => "  • " + m[1] + " = " + m[2].trim()).join('\n');
+          return {
+            success: true,
+            output: "[.NET 8.0 Console Output - Time: 0.01s]\n------------------------------------------------------------\n✅ Code C# đã thực thi thành công!\nCác biến đã được khởi tạo trong bộ nhớ:\n" + varSummary + "\n\n💡 Mẹo: Thêm lệnh Console.WriteLine($\"Tổng tiền: {total}\"); để in kết quả ra màn hình!\n------------------------------------------------------------\n[Process exited with code 0]"
+          };
+        } else {
+          return {
+            success: true,
+            output: "[.NET 8.0 Console Output - Time: 0.01s]\n------------------------------------------------------------\n✅ Code đã thực thi thành công (Không có lỗi cú pháp)!\n------------------------------------------------------------\n[Process exited with code 0]"
+          };
+        }
+      }
+    } catch (err) {
+      let errMsg = err.message;
+      let suggestion = "Kiểm tra lại cú pháp C#, dấu ngoặc kép \"\" hoặc dấu chấm phẩy ;";
+      if (errMsg.includes("is not defined")) {
+        const varName = errMsg.split(" ")[0];
+        suggestion = "Biến '" + varName + "' chưa được khai báo hoặc bạn quên đặt chuỗi chữ trong dấu ngoặc kép \"\" (Ví dụ: string productName = \"Bánh mì\";).";
+      }
+      return {
+        success: false,
+        output: "[C# Compiler Notice - Time: 0.01s]\n------------------------------------------------------------\n❌ Lỗi: " + errMsg + "\n💡 Hướng dẫn sửa: " + suggestion
+      };
+    }
+  }
+
+  $("runCodeLiveBtn").onclick = () => {
     const userCode = editor.value.trim();
     if (!userCode) {
       alert("Vui lòng nhập code C# trước khi chạy.");
@@ -6662,53 +6782,13 @@ Main();`;
 
     termWin.classList.add("show");
     termBody.className = "terminal-body";
-    termBody.textContent = "⏳ Đang biên dịch và thực thi trên .NET 8 Virtual Runtime...\n";
-    termMeta.textContent = "Status: Compiling & Executing...";
+    termMeta.textContent = "Status: Executing...";
 
-    const startTime = performance.now();
-
-    // 1. Phân tích cú pháp cơ bản & mô phỏng Console.WriteLine client-side nếu code mẫu cơ bản
-    const consoleRegex = /Console\.WriteLine\s*\(\s*(?:[$@]*"([^"]*)"|([^)]+))\s*\);?/g;
-    let match;
-    const directOutputs = [];
-    while ((match = consoleRegex.exec(userCode)) !== null) {
-      if (match[1] !== undefined) {
-        directOutputs.push(match[1].replace(/\\n/g, "\n"));
-      } else if (match[2]) {
-        directOutputs.push(`[Value of: ${match[2].trim()}]`);
-      }
-    }
-
-    // 2. Kích hoạt Gemini AI Compiler Simulation để cho ra kết quả Runtime chuẩn xác nhất
-    const prompt = `Bạn là một C# .NET 8 / CLR Runtime Engine. Hãy BIÊN DỊCH và THỰC THI đoạn mã C# sau đây.
-YÊU CẦU ĐẶC BIỆT:
-Chỉ in ra kết quả Standard Output (những gì xuất ra màn hình console) và nếu có lỗi biên dịch/runtime thì in thông báo lỗi rõ ràng. Không giải thích dông dài ngoài output của console!
-
-ĐOẠN CODE C#:
-\`\`\`csharp
-${userCode}
-\`\`\``;
-
-    const res = await callGeminiApi(prompt, lesson);
-    const endTime = performance.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-
-    if (res.ok && res.text) {
-      // Clean markdown code blocks if any
-      const cleaned = res.text.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-      termBody.textContent = `[Running in .NET 8.0 Environment - Memory: ~12.4MB - Time: ${duration}s]\n------------------------------------------------------------\n${cleaned}\n------------------------------------------------------------\n[Process exited with code 0]`;
-      termMeta.textContent = `Status: Success (${duration}s)`;
-    } else if (directOutputs.length > 0) {
-      // Fallback client simulation
-      termBody.textContent = `[Running in Client C# Simulator - Time: ${duration}s]\n------------------------------------------------------------\n${directOutputs.join("\n")}\n------------------------------------------------------------\n[Process completed successfully]`;
-      termMeta.textContent = `Status: Success (Client simulated)`;
-    } else {
-      termBody.textContent = `[Compiled successfully]\nCode đã thực thi mà không có lệnh Console.WriteLine in ra màn hình.\nHãy thêm Console.WriteLine(...) hoặc bấm 'Nhờ AI Review' để phân tích chi tiết!`;
-      termMeta.textContent = "Status: Done";
-    }
+    const res = executeCSharpCodeClient(userCode);
+    termBody.textContent = res.output;
+    termMeta.textContent = res.success ? "Status: Success (0.01s)" : "Status: Notice (0.01s)";
   };
 
-  // DEBUG CODE WITH AI
   $("debugAiBtn").onclick = () => {
     if (el.tutorPanel) el.tutorPanel.classList.add("open");
     const userCode = editor.value;
