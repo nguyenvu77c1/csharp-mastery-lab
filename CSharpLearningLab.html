@@ -10,6 +10,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <!-- Markdown parser for AI responses -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Prism.js Syntax Highlighting for C# code -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-csharp.min.js"></script>
   <style>
 /* ==========================================================================
    DESIGN SYSTEM - OBSIDIAN CYBER STUDIO (PREMIUM DARK / SLEEK LIGHT)
@@ -1750,6 +1754,465 @@ pre {
     font-size: 20px !important;
   }
 }
+/* ── STREAK BADGE ── */
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #ff6b35, #ff9f1c);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  animation: streakPulse 2s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+@keyframes streakPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ── LEVEL FILTER BAR ── */
+.level-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid var(--line);
+}
+.level-pill {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted-text);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.level-pill:hover { border-color: var(--accent); color: var(--accent); }
+.level-pill.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 1px 6px var(--accent-glow);
+}
+
+/* ── BOOKMARK BUTTON ── */
+.bookmark-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted-text);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-left: auto;
+}
+.bookmark-btn:hover { border-color: #f59e0b; color: #f59e0b; }
+.bookmark-btn.bookmarked {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+/* ── PRISM.JS OVERRIDES (MATCH DESIGN SYSTEM) ── */
+:root[data-theme="dark"] pre[class*="language-"],
+:root[data-theme="dark"] code[class*="language-"] {
+  background: var(--bg-subtle) !important;
+  font-family: 'Fira Code', monospace !important;
+  font-size: 13.5px !important;
+}
+:root[data-theme="light"] pre[class*="language-"],
+:root[data-theme="light"] code[class*="language-"] {
+  background: #f8fafc !important;
+  font-family: 'Fira Code', monospace !important;
+  font-size: 13.5px !important;
+}
+pre[class*="language-"] {
+  margin: 0 !important;
+  padding: 16px !important;
+  border-radius: 0 0 10px 10px !important;
+  overflow-x: auto;
+}
+
+/* ── PILL ACTION BUTTONS (TOPBAR) ── */
+.pill-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--line);
+  background: var(--panel-card);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.pill-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.roadmap-btn {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+  border-color: rgba(99, 102, 241, 0.35);
+  color: #a5b4fc;
+}
+.roadmap-btn:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.3));
+  border-color: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.cheatsheet-btn {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(16, 185, 129, 0.15));
+  border-color: rgba(6, 182, 212, 0.35);
+  color: #67e8f9;
+}
+.cheatsheet-btn:hover {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(16, 185, 129, 0.3));
+  border-color: var(--cyan);
+  color: #ffffff;
+  box-shadow: 0 0 16px var(--cyan-glow);
+}
+
+/* ── SEMANTIC LEVEL BADGES ── */
+.badge-level-volong {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #34d399 !important;
+}
+.badge-level-coban {
+  background: rgba(6, 182, 212, 0.15) !important;
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  color: #38bdf8 !important;
+}
+.badge-level-trungbinh {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: #fbbf24 !important;
+}
+.badge-level-nangcao {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  color: #c084fc !important;
+}
+.badge-level-tonghop {
+  background: rgba(244, 63, 94, 0.15) !important;
+  border-color: rgba(244, 63, 94, 0.4) !important;
+  color: #fb7185 !important;
+}
+
+/* ── HERO BREADCRUMB & QUICK NAV ── */
+.hero-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.hero-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted-text);
+  font-weight: 600;
+}
+.hero-breadcrumb span.bc-mod {
+  color: var(--accent);
+}
+.hero-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.hero-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: var(--panel-card);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.hero-nav-btn:hover {
+  background: var(--panel-hover);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+/* ── KEY TAKEAWAYS (30s REFRESHER CARD) ── */
+.key-takeaway-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.key-takeaway-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.key-takeaway-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+}
+.key-takeaway-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.key-takeaway-list li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.key-takeaway-list li::before {
+  content: "⚡";
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ── ROADMAP MODAL TRACKS ── */
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+.track-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+.track-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 15px var(--accent-glow);
+}
+.track-card.recommended {
+  border-color: rgba(99, 102, 241, 0.5);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(15, 23, 42, 0.8));
+}
+.track-ribbon {
+  position: absolute;
+  top: 12px;
+  right: -30px;
+  background: linear-gradient(90deg, #f59e0b, #ff6b35);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 3px 32px;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  text-transform: uppercase;
+}
+.track-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.track-icon {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--panel-card);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+}
+.track-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.track-desc {
+  font-size: 12.5px;
+  color: var(--muted-text);
+  line-height: 1.5;
+}
+.track-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  margin-top: auto;
+}
+.track-btn {
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+.track-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ── CHEATSHEET MODAL & TABS ── */
+.cheatsheet-tabs-bar {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.cs-tab-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  color: var(--muted-text);
+  white-space: nowrap;
+}
+.cs-tab-btn:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.cs-tab-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+.cs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+.cs-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cs-card-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.cs-table th, .cs-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+.cs-table th {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--ink);
+  font-weight: 700;
+}
+.cs-table td code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 11px;
+}
+
+/* ── TOAST NOTIFICATIONS ── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 999999;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(15, 23, 42, 0.92);
+  color: #fff;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: toastFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1), toastFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) 2.7s forwards;
+}
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastFadeOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+}
+
+
   </style>
 </head>
 <body>
@@ -1781,6 +2244,15 @@ pre {
       </div>
 
       <div class="topbar-actions">
+        <button id="openRoadmapBtn" class="pill-action-btn roadmap-btn" title="Chọn Lộ trình học theo mục tiêu (Cho người quay lại C#)">
+          <span>🗺️</span>
+          <span>Lộ trình</span>
+        </button>
+        <button id="openCheatSheetBtn" class="pill-action-btn cheatsheet-btn" title="Tra cứu nhanh Cú pháp C# Hiện đại (Cheat Sheet)">
+          <span>⚡</span>
+          <span>Cheat Sheet</span>
+        </button>
+        <span id="streakBadge" class="streak-badge" title="Streak học tập liên tiếp" style="display:none;">🔥 <span id="streakCount">0</span> ngày</span>
         <button id="toggleAiBtn" class="toggle-ai-topbar-btn" title="Mở Trợ lý AI Copilot">
           <span>🤖</span>
           <span>AI Copilot</span>
@@ -1803,12 +2275,21 @@ pre {
     <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-mobile-header">
-        <strong>📚 Danh mục 26 Bài học</strong>
+        <strong>📚 Danh mục <span id="sidebarCountLabel">...</span> Bài học</strong>
         <button id="closeSidebarBtn" class="btn-icon" style="width: 28px; height: 28px;">&times;</button>
       </div>
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input id="searchInput" type="search" placeholder="Tìm kiếm: async, LINQ, DI, Span..." />
+      </div>
+      <!-- Level Filter Pills -->
+      <div id="levelFilterBar" class="level-filter-bar">
+        <button class="level-pill active" data-level="All">Tất cả</button>
+        <button class="level-pill" data-level="Vỡ lòng">Vỡ lòng</button>
+        <button class="level-pill" data-level="Cơ bản">Cơ bản</button>
+        <button class="level-pill" data-level="Trung bình">Trung bình</button>
+        <button class="level-pill" data-level="Nâng cao">Nâng cao</button>
+        <button class="level-pill" data-level="Bookmark">⭐ Yêu thích</button>
       </div>
 
       <nav id="moduleNav" class="module-nav-container"></nav>
@@ -1850,7 +2331,8 @@ pre {
     </div>
 
     <div class="quick-prompts-bar">
-      <button class="quick-prompt-btn" data-prompt="Giải thích bài này thật ngắn gọn, dễ hiểu như cho Fresher.">💡 Giải thích dễ hiểu</button>
+      <button class="quick-prompt-btn" data-prompt="Giải thích ngắn gọn bài này trong 30 giây cho người từng học lập trình quay lại C#.">💡 Tóm tắt 30s</button>
+      <button class="quick-prompt-btn" data-prompt="So sánh cú pháp này với Java, JavaScript hoặc các bản C# đời cũ để tôi dễ liên hệ.">🔄 So sánh Java / JS</button>
       <button class="quick-prompt-btn" data-prompt="Cho tôi một ví dụ nghiệp vụ K2POS / Bán lẻ thực tế ứng dụng kiến thức này.">🛒 Ví dụ K2POS</button>
       <button class="quick-prompt-btn" data-prompt="Hãy review đoạn code trong phần thực hành của tôi và chỉ ra lỗi tiềm ẩn (deadlock, memory, clean code).">🔍 Review Code của tôi</button>
       <button class="quick-prompt-btn" data-prompt="Hãy đóng vai Tech Lead phỏng vấn tôi 2 câu hỏi hóc búa về chủ đề này.">🎙️ Mock Interview</button>
@@ -1917,6 +2399,258 @@ pre {
       </div>
     </div>
   </div>
+
+  <!-- ROADMAP MODAL (LEARNING TRACKS) -->
+  <div id="roadmapModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 860px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 22px;">🗺️</span>
+          <div>
+            <h3>Lộ trình Học C# Theo Mục Tiêu</h3>
+            <p style="font-size: 12px; color: var(--muted-text); margin-top: 2px;">Chọn một lộ trình phù hợp với xuất phát điểm và mục tiêu của bạn để học tập hiệu quả nhất!</p>
+          </div>
+        </div>
+        <button id="closeRoadmapModalBtn" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+        <div class="roadmap-grid">
+          <!-- Track 1 -->
+          <div class="track-card recommended">
+            <span class="track-ribbon">Khuyên Dùng</span>
+            <div class="track-header">
+              <div class="track-icon">🚀</div>
+              <div>
+                <div class="track-title">C# Modern Refresher</div>
+                <span class="badge-pill accent" style="font-size: 10px; padding: 2px 6px;">Cho người quay lại C#</span>
+              </div>
+            </div>
+            <p class="track-desc">Bắt kịp ngay các cú pháp đột phá nhất từ C# 8 đến C# 12: Record, Pattern Matching, Top-Level Statements, Collection Expressions & LINQ nâng cao.</p>
+            <div class="track-meta">
+              <span>⏱ ~2.5 giờ</span>
+              <span>📚 6 bài học trọng tâm</span>
+            </div>
+            <button class="track-btn" data-track="modern">Bắt đầu lộ trình này ➔</button>
+          </div>
+
+          <!-- Track 2 -->
+          <div class="track-card">
+            <div class="track-header">
+              <div class="track-icon">⚡</div>
+              <div>
+                <div class="track-title">Async & High Performance</div>
+                <span class="badge-pill purple" style="font-size: 10px; padding: 2px 6px;">Backend Pro</span>
+              </div>
+            </div>
+            <p class="track-desc">Làm chủ Concurrency, Async/Await không bị deadlock, SemaphoreSlim điều tiết luồng, Span&lt;T&gt;, Memory&lt;T&gt; và BenchmarkDotNet tối ưu RAM.</p>
+            <div class="track-meta">
+              <span>⏱ ~3.5 giờ</span>
+              <span>📚 7 bài chuyên sâu</span>
+            </div>
+            <button class="track-btn" data-track="performance">Bắt đầu lộ trình này ➔</button>
+          </div>
+
+          <!-- Track 3 -->
+          <div class="track-card">
+            <div class="track-header">
+              <div class="track-icon">🏢</div>
+              <div>
+                <div class="track-title">Web API & Enterprise Architecture</div>
+                <span class="badge-pill" style="font-size: 10px; padding: 2px 6px; background: rgba(6,182,212,0.15); color: #38bdf8; border-color: rgba(6,182,212,0.4);">Doanh nghiệp</span>
+              </div>
+            </div>
+            <p class="track-desc">Xây dựng Backend RESTful API hoàn chỉnh: Middleware Pipeline, JWT Authentication, EF Core Migrations, Repository + Unit of Work & Unit Test xUnit.</p>
+            <div class="track-meta">
+              <span>⏱ ~4 giờ</span>
+              <span>📚 8 bài thực chiến</span>
+            </div>
+            <button class="track-btn" data-track="enterprise">Bắt đầu lộ trình này ➔</button>
+          </div>
+
+          <!-- Track 4 -->
+          <div class="track-card">
+            <div class="track-header">
+              <div class="track-icon">🎓</div>
+              <div>
+                <div class="track-title">Toàn diện từ Số 0 đến Kiến trúc sư</div>
+                <span class="badge-pill" style="font-size: 10px; padding: 2px 6px; background: rgba(16,185,129,0.15); color: #34d399; border-color: rgba(16,185,129,0.4);">Full Mastery</span>
+              </div>
+            </div>
+            <p class="track-desc">Lộ trình bài bản từ cơ bản cú pháp, OOP, LINQ, Concurrency đến EF Core, Clean Architecture và đồ án Capstone K2POS AI Copilot hoàn chỉnh.</p>
+            <div class="track-meta">
+              <span>⏱ ~15 giờ</span>
+              <span>📚 31 bài học đầy đủ</span>
+            </div>
+            <button class="track-btn" data-track="full">Học toàn bộ giáo trình ➔</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHEAT SHEET MODAL (QUICK REFERENCE) -->
+  <div id="cheatSheetModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 920px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 22px;">⚡</span>
+          <div>
+            <h3>C# Modern Quick Reference & Cheat Sheet</h3>
+            <p style="font-size: 12px; color: var(--muted-text); margin-top: 2px;">Bảng tra cứu nhanh cú pháp, kiến trúc và best practices chuẩn Senior .NET</p>
+          </div>
+        </div>
+        <button id="closeCheatSheetModalBtn" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="max-height: 72vh; overflow-y: auto;">
+        <div class="cheatsheet-tabs-bar">
+          <button class="cs-tab-btn active" data-tab="modern-syntax">🚀 C# Hiện đại (9-12)</button>
+          <button class="cs-tab-btn" data-tab="aspnet-di">🌐 ASP.NET Core & DI</button>
+          <button class="cs-tab-btn" data-tab="linq-ref">🔍 LINQ & Collections</button>
+          <button class="cs-tab-btn" data-tab="async-perf">⚡ Async & Performance</button>
+        </div>
+
+        <!-- TAB 1: MODERN SYNTAX -->
+        <div id="csTab_modern-syntax" class="cs-tab-pane">
+          <div class="cs-grid">
+            <div class="cs-card">
+              <div class="cs-card-title">📦 record vs class vs struct</div>
+              <table class="cs-table">
+                <thead>
+                  <tr><th>Loại</th><th>Bản chất</th><th>So sánh Equality</th><th>Use-Case</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td><code>class</code></td><td>Reference Type</td><td>Theo địa chỉ ô nhớ</td><td>Entity, Services có trạng thái</td></tr>
+                  <tr><td><code>record</code></td><td>Ref/Value Type (Immutable)</td><td>Theo giá trị thuộc tính (Value equality)</td><td>DTO, Events, API Response</td></tr>
+                  <tr><td><code>struct</code></td><td>Value Type (Stack)</td><td>Theo giá trị</td><td>Dữ liệu nhỏ, ngắn hạn (Point, Vector)</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="cs-card">
+              <div class="cs-card-title">🎯 Switch Expression & Pattern Matching</div>
+              <pre><code class="language-csharp">// C# 8+ Switch Expression
+string status = order switch
+{
+    { Status: "Paid", Amount: > 1_000_000m } => "VIP Paid",
+    { Status: "Pending" } => "Chờ duyệt",
+    _ => "Khác"
+};
+
+// C# 11+ List Pattern
+if (args is ["--env", var env, "--port", var port])
+    Console.WriteLine($"Env: {env}, Port: {port}");</code></pre>
+            </div>
+
+            <div class="cs-card">
+              <div class="cs-card-title">✨ C# 12 Primary Constructors & Collection Expressions</div>
+              <pre><code class="language-csharp">// Primary Constructor: Inject trực tiếp trên tên class!
+public class OrderService(IRepository repo, ILogger<OrderService> logger)
+{
+    public void Process() => logger.LogInformation("Processing...");
+}
+
+// Collection Expressions & Spread operator [..a, ..b]
+int[] a = [1, 2, 3];
+int[] b = [4, 5];
+List<int> combined = [..a, ..b, 6, 7]; // [1, 2, 3, 4, 5, 6, 7]</code></pre>
+            </div>
+
+            <div class="cs-card">
+              <div class="cs-card-title">📝 Raw String Literals (C# 11+)</div>
+              <pre><code class="language-csharp">// 3 dấu ngoặc kép: không cần escape dấu ", xuống dòng tự nhiên!
+string json = """
+{
+  "name": "K2POS",
+  "version": 8.0,
+  "isActive": true
+}
+""";</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: ASP.NET CORE & DI -->
+        <div id="csTab_aspnet-di" class="cs-tab-pane" style="display: none;">
+          <div class="cs-grid">
+            <div class="cs-card">
+              <div class="cs-card-title">💉 Dependency Injection Lifetimes</div>
+              <table class="cs-table">
+                <thead><tr><th>Lifetime</th><th>Vòng đời</th><th>Ví dụ điển hình</th></tr></thead>
+                <tbody>
+                  <tr><td><code>AddTransient</code></td><td>Tạo instance mới mỗi lần yêu cầu</td><td>Helper nhẹ, Calculator, GuidGenerator</td></tr>
+                  <tr><td><code>AddScoped</code></td><td>1 instance duy nhất trong 1 HTTP Request</td><td>DbContext, Repository, UnitOfWork</td></tr>
+                  <tr><td><code>AddSingleton</code></td><td>1 instance duy nhất cho toàn bộ App</td><td>MemoryCache, RabbitMQ Connection, AppSettings</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="cs-card">
+              <div class="cs-card-title">🧅 Thứ tự Middleware Pipeline chuẩn</div>
+              <pre><code class="language-csharp">var app = builder.Build();
+
+app.UseExceptionHandler("/error"); // 1. Bắt lỗi toàn cục
+app.UseHttpsRedirection();         // 2. HTTPS
+app.UseCors();                     // 3. CORS
+app.UseAuthentication();           // 4. BẠN LÀ AI? (JWT Token)
+app.UseAuthorization();            // 5. BẠN CÓ QUYỀN GÌ?
+app.MapControllers();              // 6. Endpoint Handlers</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: LINQ & COLLECTIONS -->
+        <div id="csTab_linq-ref" class="cs-tab-pane" style="display: none;">
+          <div class="cs-grid">
+            <div class="cs-card">
+              <div class="cs-card-title">🔍 Top LINQ Methods Thực Chiến</div>
+              <table class="cs-table">
+                <thead><tr><th>Method</th><th>Chức năng</th><th>Ví dụ</th></tr></thead>
+                <tbody>
+                  <tr><td><code>.Where()</code></td><td>Lọc điều kiện</td><td><code>list.Where(x => x.Active)</code></td></tr>
+                  <tr><td><code>.Select()</code></td><td>Chuyển đổi kiểu (Map DTO)</td><td><code>list.Select(x => x.Name)</code></td></tr>
+                  <tr><td><code>.GroupBy()</code></td><td>Gom nhóm theo Key</td><td><code>orders.GroupBy(o => o.Status)</code></td></tr>
+                  <tr><td><code>.SelectMany()</code></td><td>Làm phẳng danh sách lồng</td><td><code>orders.SelectMany(o => o.Items)</code></td></tr>
+                  <tr><td><code>.Skip().Take()</code></td><td>Phân trang dữ liệu</td><td><code>list.Skip(page * size).Take(size)</code></td></tr>
+                  <tr><td><code>.Any() / .All()</code></td><td>Kiểm tra tồn tại / thỏa mãn tất cả</td><td><code>list.Any(x => x.Price > 100)</code></td></tr>
+                  <tr><td><code>.FirstOrDefault()</code></td><td>Lấy phần tử đầu hoặc null</td><td><code>list.FirstOrDefault(x => x.Id == 1)</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: ASYNC & PERFORMANCE -->
+        <div id="csTab_async-perf" class="cs-tab-pane" style="display: none;">
+          <div class="cs-grid">
+            <div class="cs-card">
+              <div class="cs-card-title">⚡ Quy tắc Vàng Async/Await</div>
+              <ul style="padding-left: 18px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);">
+                <li><strong>KHÔNG BAO GIỜ dùng <code>async void</code></strong> (trừ Event Handler trong UI Desktop). Luôn dùng <code>async Task</code>.</li>
+                <li><strong>KHÔNG dùng <code>.Result</code> hoặc <code>.Wait()</code></strong> trên luồng đồng bộ vì dễ gây Deadlock ThreadPool. Luôn dùng <code>await</code>.</li>
+                <li>Dùng <code>Task.WhenAll(tasks)</code> để chạy nhiều tác vụ I/O song song thay vì tuần tự.</li>
+                <li>Dùng <code>SemaphoreSlim</code> để giới hạn số luồng (throttling) khi gọi API bên ngoài hoặc batch query.</li>
+                <li>Luôn truyền <code>CancellationToken</code> vào các hàm async để giải phóng tài nguyên khi client cancel request.</li>
+              </ul>
+            </div>
+
+            <div class="cs-card">
+              <div class="cs-card-title">🚀 EF Core Query Tối Ưu</div>
+              <pre><code class="language-csharp">// Dùng AsNoTracking() cho query chỉ đọc để nhanh hơn 30%
+var list = await db.Orders
+    .Include(o => o.Customer) // Tránh bẫy N+1 Query
+    .AsNoTracking()
+    .Where(o => o.TotalAmount > 500_000m)
+    .ToListAsync(cancellationToken);</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="toast-container"></div>
+
 
   <script>
 /* ==========================================================================
@@ -3600,22 +4334,20 @@ List<int> result = [..a, ..b];`
       }
     ]
   },
-
-  /* ---------------- MODULE 8: CAPSTONE PROJECT & ARCHITECTURE ---------------- */
   {
-    id: "capstone",
-    module: "8. Dự án Tổng hợp",
-    title: "Mini K2POS AI Copilot: Ghép nối toàn bộ Kiến trúc Doanh nghiệp",
-    minutes: 60,
-    level: "Tổng hợp",
-    tags: ["Capstone", "Architecture", "K2POS", "FullSystem"],
-    short: "Kết nối tất cả: Clean Architecture, Asynchronous Pipeline, EF Core Optimized, Semantic Kernel AI & Resilience thành hệ thống hoàn chỉnh.",
-    goals: [
+    "id": "capstone",
+    "module": "8. Dự án Tổng hợp",
+    "title": "Mini K2POS AI Copilot: Ghép nối toàn bộ Kiến trúc Doanh nghiệp",
+    "minutes": 60,
+    "level": "Tổng hợp",
+    "tags": ["Capstone", "Architecture", "K2POS", "FullSystem"],
+    "short": "Kết nối tất cả: Clean Architecture, Asynchronous Pipeline, EF Core Optimized, Semantic Kernel AI & Resilience thành hệ thống hoàn chỉnh.",
+    "goals": [
       "Vẽ được sơ đồ luồng dữ liệu trọn vẹn từ POS Browser -> Web API -> Middleware -> Services -> EF Core/AI -> Response.",
       "Tự tin phân tích và refactor các lỗi kiến trúc kinh điển trong dự án thực tế.",
       "Hoàn thành lộ trình làm chủ C# .NET hiện đại!"
     ],
-    explain: [
+    "explain": [
       "Luồng hoạt động hoàn chỉnh của tính năng K2POS AI Assistant:",
       "1. Thu ngân bấm hỏi: 'Tổng doanh thu hôm nay và cảnh báo món sắp hết hàng'.",
       "2. Request đi qua Middleware: Global Error -> CORS -> JWT Authentication -> Authorization -> Rate Limiter.",
@@ -3690,6 +4422,852 @@ List<int> result = [..a, ..b];`
         explain: "Một hệ thống chất lượng cao đòi hỏi sự kết hợp hài hòa giữa hiệu năng, độ tin cậy và bảo mật."
       }
     ]
+  },
+
+  /* ---- BONUS LESSONS ---- */
+  {
+    id: "linq-advanced",
+    module: "2. Delegates, Events & LINQ",
+    title: "LINQ Nâng cao: GroupBy, SelectMany, Join & Phân trang",
+    minutes: 35,
+    level: "Trung bình",
+    tags: ["LINQ", "GroupBy", "SelectMany", "Join", "Pagination"],
+    short: "Làm chủ LINQ phức tạp: nhóm dữ liệu (GroupBy), phẳng hóa danh sách (SelectMany) và phân trang chuẩn hóa với Skip/Take.",
+    goals: [
+      "Dùng GroupBy để tổng hợp dữ liệu theo nhóm: doanh thu theo ngày, đơn hàng theo trạng thái.",
+      "Áp dụng SelectMany để phẳng hóa danh sách lồng nhau (List<List<T>> → List<T>).",
+      "Phân trang dữ liệu chuẩn với .Skip(pageIndex * pageSize).Take(pageSize) — luôn .OrderBy() trước."
+    ],
+    explain: [
+      "1. GroupBy: Tương tự GROUP BY trong SQL. Nhóm phần tử theo một key, trả về IEnumerable<IGrouping<TKey, TElement>>. Ví dụ: nhóm đơn hàng theo PaymentMethod để tổng hợp doanh thu.",
+      "2. SelectMany: Khi mỗi phần tử cha chứa một danh sách con và bạn muốn gộp tất cả con thành 1 danh sách phẳng. orders.SelectMany(o => o.Items) → lấy tất cả OrderItem từ mọi đơn hàng.",
+      "3. Pagination (Phân trang): Công thức: .Skip(page * size).Take(size). Page bắt đầu từ 0. Bắt buộc gọi .OrderBy() trước Skip/Take để kết quả nhất quán giữa các trang.",
+      "4. IQueryable vs IEnumerable: Với EF Core, LINQ query trên IQueryable được dịch sang SQL. Với IEnumerable, filter xảy ra trên bộ nhớ. Luôn ưu tiên IQueryable để tránh tải toàn bộ bảng về RAM."
+    ],
+    analogy: "GroupBy như phân loại hóa đơn vào ngăn kéo: Tiền mặt, QR Code, Thẻ. SelectMany như đổ tất cả ngăn kéo ra thành một đống để đếm tổng. Phân trang như chỉ hiển thị 10 trang đầu của cuốn danh bạ dày 100 trang.",
+    code: [
+      {
+        title: "GroupBy: Tổng hợp doanh thu theo phương thức thanh toán",
+        code: `var orders = new List<(string Method, decimal Amount)>
+{
+    ("Cash",   150_000m), ("QRCode", 220_000m),
+    ("Cash",    80_000m), ("Card",   350_000m), ("QRCode", 190_000m),
+};
+
+var summary = orders
+    .GroupBy(o => o.Method)
+    .Select(g => new
+    {
+        Method  = g.Key,
+        Count   = g.Count(),
+        Revenue = g.Sum(o => o.Amount)
+    })
+    .OrderByDescending(x => x.Revenue);
+
+foreach (var s in summary)
+    Console.WriteLine($"{s.Method}: {s.Count} đơn - {s.Revenue:N0} VNĐ");`,
+        note: "g.Key là giá trị nhóm. g.Count() và g.Sum() hoạt động trực tiếp trên từng nhóm."
+      },
+      {
+        title: "Phân trang chuẩn: Skip / Take",
+        code: `var products = Enumerable.Range(1, 50)
+    .Select(i => new { Id = i, Name = $"Sản phẩm #{i}", Price = i * 10_000m })
+    .ToList();
+
+int pageIndex = 1; // Trang thứ 2 (tính từ 0)
+int pageSize  = 10;
+int totalPages = (int)Math.Ceiling(products.Count / (double)pageSize);
+
+var page = products
+    .OrderBy(p => p.Id)          // Luôn sắp xếp trước khi phân trang!
+    .Skip(pageIndex * pageSize)  // Bỏ qua trang trước
+    .Take(pageSize)              // Lấy đúng số lượng
+    .ToList();
+
+Console.WriteLine($"Trang {pageIndex + 1}/{totalPages}:");
+page.ForEach(p => Console.WriteLine($"  [{p.Id}] {p.Name}"));`,
+        note: "Skip(1 * 10) bỏ qua 10 mục đầu. Take(10) lấy 10 mục tiếp theo (mục 11-20)."
+      }
+    ],
+    practice: {
+      question: "Viết LINQ GroupBy để nhóm mảng `orders` theo trường `Method`, sau đó dùng `.Sum(o => o.Amount)` để tính tổng tiền mỗi nhóm. Gán kết quả vào `var grouped`.",
+      starter: `var orders = new[] {
+    new { Method = "Cash",   Amount = 100_000m },
+    new { Method = "QRCode", Amount = 200_000m },
+    new { Method = "Cash",   Amount = 50_000m },
+};
+var grouped = orders
+    .GroupBy(/* o => o.Method */)
+    .Select(g => new { g.Key, Total = g.Sum(/* o => o.Amount */) });`,
+      requiredTokens: ["GroupBy(o => o.Method)", "g.Sum(o => o.Amount)"],
+      forbiddenTokens: [],
+      hint: "Gọi .GroupBy(o => o.Method) để nhóm, trong .Select dùng g.Sum(o => o.Amount) để tổng hợp.",
+      success: "Tuyệt vời! Bạn đã nắm vững GroupBy — công cụ tổng hợp dữ liệu mạnh nhất trong LINQ.",
+      solution: `var grouped = orders
+    .GroupBy(o => o.Method)
+    .Select(g => new { Method = g.Key, Total = g.Sum(o => o.Amount) });
+foreach (var g in grouped)
+    Console.WriteLine($"{g.Method}: {g.Total:N0} VNĐ");`
+    },
+    quiz: [
+      {
+        q: "Nếu pageIndex = 2 và pageSize = 10, lệnh Skip cần bỏ qua bao nhiêu phần tử để lấy đúng trang thứ 3?",
+        options: ["2", "10", "20", "30"],
+        answer: 2,
+        explain: "Skip(pageIndex * pageSize) = Skip(2 * 10) = Skip(20). Bỏ qua 20 phần tử đầu (trang 0 và trang 1) để lấy trang 2."
+      }
+    ]
+  },
+  {
+    id: "events-pattern",
+    module: "2. Delegates, Events & LINQ",
+    title: "Events, EventHandler & Mô hình Publish-Subscribe",
+    minutes: 30,
+    level: "Trung bình",
+    tags: ["Events", "EventHandler", "Delegate", "Observer", "PublishSubscribe"],
+    short: "Nắm vững sự kiện (event) trong C#: cách khai báo, đăng ký, hủy đăng ký và ứng dụng mô hình Observer thực chiến.",
+    goals: [
+      "Hiểu event là một loại delegate đặc biệt — chỉ class chủ sở hữu mới được raise (gọi) nó.",
+      "Khai báo và raise event với EventHandler<TEventArgs> chuẩn mực C#.",
+      "Ứng dụng Publish-Subscribe: Tách biệt logic nghiệp vụ khỏi UI hoặc notification system."
+    ],
+    explain: [
+      "1. Delegate là gì? Là con trỏ hàm an toàn kiểu (type-safe function pointer). Nó lưu tham chiếu đến một hoặc nhiều phương thức có cùng chữ ký (signature).",
+      "2. Event là Delegate đặc biệt: Chỉ class owner mới có thể invoke event đó. Subscriber bên ngoài chỉ được += (đăng ký) và -= (hủy đăng ký), KHÔNG được gọi trực tiếp.",
+      "3. EventHandler<TEventArgs>: Convention chuẩn .NET. Chữ ký: void Handler(object? sender, TArgs e). sender là object phát sự kiện, e là dữ liệu kèm theo.",
+      "4. Pattern Publish-Subscribe: OrderProcessor (Publisher) phát event khi đơn hàng hoàn tất. PrinterService, EmailService, InventoryService (Subscribers) lắng nghe và phản ứng độc lập — hoàn toàn decouple nhau."
+    ],
+    analogy: "Event giống như chuông thu ngân tại quầy thanh toán. Khi bấm chuông (raise event), tất cả nhân viên đăng ký nghe (subscribers) đều nhận tín hiệu và phản ứng theo vai trò của mình mà không ai cần biết ai đang nghe.",
+    code: [
+      {
+        title: "Khai báo và Raise Event chuẩn C#",
+        code: `public class OrderCompletedEventArgs : EventArgs
+{
+    public int     OrderId       { get; init; }
+    public decimal TotalAmount   { get; init; }
+    public string  PaymentMethod { get; init; } = "";
+}
+
+public class OrderProcessor
+{
+    public event EventHandler<OrderCompletedEventArgs>? OnOrderCompleted;
+
+    public void ProcessOrder(int orderId, decimal amount, string method)
+    {
+        Console.WriteLine($"[OrderProcessor] Đang xử lý đơn #{orderId}...");
+        // Raise event dùng ?.Invoke() để an toàn null
+        OnOrderCompleted?.Invoke(this, new OrderCompletedEventArgs
+        {
+            OrderId = orderId, TotalAmount = amount, PaymentMethod = method
+        });
+    }
+}
+
+// Subscriber
+var processor = new OrderProcessor();
+processor.OnOrderCompleted += (sender, e) =>
+    Console.WriteLine($"[Printer] In hóa đơn #{e.OrderId}: {e.TotalAmount:N0} VNĐ");
+processor.OnOrderCompleted += (sender, e) =>
+    Console.WriteLine($"[Inventory] Cập nhật kho cho đơn #{e.OrderId}");
+
+processor.ProcessOrder(1042, 350_000m, "QRCode");`,
+        note: "OnOrderCompleted?.Invoke() dùng null-conditional để tránh NullReferenceException khi chưa có subscriber."
+      }
+    ],
+    practice: {
+      question: "Khai báo một event `public event EventHandler? OnPaymentReceived;` trong class `PaymentTerminal`. Trong phương thức `AcceptPayment()`, raise event đó bằng `OnPaymentReceived?.Invoke(this, EventArgs.Empty);`.",
+      starter: `public class PaymentTerminal
+{
+    // Khai báo event ở đây
+
+    public void AcceptPayment()
+    {
+        Console.WriteLine("Thanh toán thành công!");
+        // Raise event ở đây
+    }
+}`,
+      requiredTokens: ["public event EventHandler? OnPaymentReceived", "OnPaymentReceived?.Invoke(this, EventArgs.Empty)"],
+      forbiddenTokens: [],
+      hint: "Khai báo: `public event EventHandler? OnPaymentReceived;` rồi gọi `OnPaymentReceived?.Invoke(this, EventArgs.Empty);`.",
+      success: "Chuẩn mực! Bạn đã hiểu cách khai báo và raise event trong C# — nền tảng của mọi GUI framework.",
+      solution: `public class PaymentTerminal
+{
+    public event EventHandler? OnPaymentReceived;
+
+    public void AcceptPayment()
+    {
+        Console.WriteLine("Thanh toán thành công!");
+        OnPaymentReceived?.Invoke(this, EventArgs.Empty);
+    }
+}`
+    },
+    quiz: [
+      {
+        q: "Điều gì phân biệt event với delegate thông thường trong C#?",
+        options: [
+          "Event nhanh hơn delegate về hiệu năng",
+          "Event chỉ có thể được raise (invoke) bởi class khai báo nó, subscriber bên ngoài chỉ được += và -=",
+          "Event không hỗ trợ lambda expression",
+          "Event không thể có tham số"
+        ],
+        answer: 1,
+        explain: "Từ khóa event bảo vệ delegate: chỉ class owner mới có quyền gọi Invoke(). Subscriber chỉ có thể += và -= — ngăn code bên ngoài vô tình clear hoặc invoke toàn bộ chain."
+      }
+    ]
+  },
+  {
+    id: "parallel-semaphore",
+    module: "3. Async/Await & Concurrency",
+    title: "Parallel.ForEach, SemaphoreSlim & Kiểm soát Luồng song song",
+    minutes: 30,
+    level: "Nâng cao",
+    tags: ["Parallel", "SemaphoreSlim", "ThreadPool", "Concurrency", "RateLimit"],
+    short: "Chạy tác vụ song song an toàn với Task.WhenAll, giới hạn số luồng đồng thời bằng SemaphoreSlim để tránh nghẽn server hoặc API rate limit.",
+    goals: [
+      "Dùng Task.WhenAll để xử lý song song danh sách tác vụ I/O hiệu quả.",
+      "Hiểu tại sao cần giới hạn concurrency và cách dùng SemaphoreSlim để điều tiết.",
+      "Phân biệt CPU-bound (Parallel.ForEach) vs I/O-bound (async/await + Task.WhenAll)."
+    ],
+    explain: [
+      "1. Task.WhenAll vs WhenAny: WhenAll chờ TẤT CẢ task hoàn thành. WhenAny chờ task ĐẦU TIÊN hoàn thành (dùng cho timeout pattern).",
+      "2. SemaphoreSlim: Bộ đếm atomic cho phép tối đa N luồng đồng thời đi qua. await semaphore.WaitAsync() chặn không đồng bộ cho đến khi có slot trống. semaphore.Release() mở khóa một slot.",
+      "3. Tại sao giới hạn concurrency? Gọi 1000 API song song cùng lúc có thể bị 429 Rate Limit, làm cạn kiệt kết nối DB pool, hoặc gây OOM. Thông thường giới hạn 5-20 concurrent tasks là hợp lý.",
+      "4. Luôn Release trong finally: Nếu có Exception mà không Release(), SemaphoreSlim sẽ bị kẹt ở 0 slot → deadlock vĩnh viễn."
+    ],
+    analogy: "SemaphoreSlim như cửa soát vé rạp chiếu phim: chỉ N người được vào cùng lúc. Khi ai đó ra (Release()), người tiếp theo mới được vào (WaitAsync() thành công). Dù hàng chờ dài đến đâu, trật tự vẫn được đảm bảo.",
+    code: [
+      {
+        title: "SemaphoreSlim: Gọi 20 API song song giới hạn 3 request cùng lúc",
+        code: `var productIds = Enumerable.Range(1, 20).ToList();
+var semaphore  = new SemaphoreSlim(3); // Tối đa 3 request đồng thời
+
+var tasks = productIds.Select(async id =>
+{
+    await semaphore.WaitAsync(); // Chờ cho đến khi có slot trống
+    try
+    {
+        await Task.Delay(200); // Giả lập gọi API
+        Console.WriteLine($"✅ Đã lấy giá sản phẩm #{id}");
+        return (id, Price: id * 10_000m);
+    }
+    finally
+    {
+        semaphore.Release(); // Luôn Release trong finally!
+    }
+}).ToList();
+
+var results = await Task.WhenAll(tasks);
+Console.WriteLine($"Hoàn tất {results.Length} sản phẩm.");`,
+        note: "Luôn đặt semaphore.Release() trong finally để đảm bảo slot được giải phóng dù có exception xảy ra."
+      }
+    ],
+    practice: {
+      question: "Tạo SemaphoreSlim giới hạn 5 concurrent tasks: `var sem = new SemaphoreSlim(5);`. Trong async lambda, gọi `await sem.WaitAsync()` trước khi làm việc và `sem.Release()` trong khối `finally`.",
+      starter: `var sem = new SemaphoreSlim(/* số tối đa */);
+
+var task = async () => {
+    await sem.WaitAsync();
+    try
+    {
+        await Task.Delay(100);
+        Console.WriteLine("Đang xử lý...");
+    }
+    finally
+    {
+        sem.Release();
+    }
+};`,
+      requiredTokens: ["new SemaphoreSlim(5)", "await sem.WaitAsync()", "sem.Release()"],
+      forbiddenTokens: [],
+      hint: "SemaphoreSlim(5) cho phép 5 task đồng thời. Gọi WaitAsync() để vào và Release() trong finally để ra.",
+      success: "Xuất sắc! SemaphoreSlim là công cụ thiết yếu để throttle concurrent I/O trong mọi .NET production.",
+      solution: `var sem = new SemaphoreSlim(5);
+
+var task = async () => {
+    await sem.WaitAsync();
+    try
+    {
+        await Task.Delay(100);
+        Console.WriteLine("Đang xử lý...");
+    }
+    finally
+    {
+        sem.Release();
+    }
+};`
+    },
+    quiz: [
+      {
+        q: "Tại sao phải đặt `semaphore.Release()` trong khối `finally` thay vì ở cuối phương thức?",
+        options: [
+          "Để chạy nhanh hơn",
+          "Để đảm bảo Release() luôn được gọi kể cả khi có Exception, tránh SemaphoreSlim bị kẹt mãi mãi",
+          "Vì C# yêu cầu Release phải ở trong finally",
+          "Để tránh deadlock với UI thread"
+        ],
+        answer: 1,
+        explain: "Nếu không dùng finally và có Exception, Release() sẽ không được gọi. Semaphore bị kẹt ở 0 slot → toàn bộ task tiếp theo chờ vĩnh viễn (deadlock)."
+      }
+    ]
+  },
+  {
+    id: "middleware-jwt",
+    module: "4. ASP.NET Core & Architecture",
+    title: "Middleware Pipeline & JWT Authentication thực chiến",
+    minutes: 35,
+    level: "Trung bình",
+    tags: ["Middleware", "JWT", "Authentication", "Authorization", "Pipeline", "AspNetCore"],
+    short: "Hiểu cách request đi qua chuỗi Middleware trong ASP.NET Core và cách bảo mật API bằng JWT Bearer Token.",
+    goals: [
+      "Giải thích Middleware Pipeline: request → middleware 1 → middleware 2 → endpoint → middleware 2 → middleware 1 → response.",
+      "Viết custom middleware để log request, đo thời gian xử lý hoặc thêm header.",
+      "Cấu hình JWT Bearer Authentication và dùng [Authorize] attribute để bảo vệ endpoint."
+    ],
+    explain: [
+      "1. Middleware Pipeline: Mỗi middleware nhận request, có thể xử lý rồi chuyển cho next() hoặc short-circuit (trả về response ngay). Thứ tự app.Use() rất quan trọng — Authentication PHẢI trước Authorization!",
+      "2. next() delegate: Khi gọi await next(context), request đi đến middleware tiếp theo. Code sau next() chạy khi response đi ngược về. Đây là Onion Pattern: vào từ ngoài vào, ra từ trong ra.",
+      "3. JWT (JSON Web Token): Gồm 3 phần: Header.Payload.Signature. Server ký bằng secret key. Client gửi trong header: Authorization: Bearer <token>. Server verify signature — không cần query DB mỗi request!",
+      "4. [Authorize] vs [AllowAnonymous]: [Authorize] ở Controller/Action yêu cầu token hợp lệ. [AllowAnonymous] override để cho phép truy cập không cần đăng nhập (ví dụ: endpoint Login)."
+    ],
+    analogy: "Middleware Pipeline như hàng rào bảo vệ tòa nhà: cổng bảo vệ (Authentication) → quét thẻ từ (Authorization) → máy dò kim loại (Rate Limiting) → vào tòa nhà (Handler). JWT như thẻ nhân viên có mã QR: bảo vệ chỉ cần scan mà không cần gọi lên phòng nhân sự.",
+    code: [
+      {
+        title: "Custom Middleware: Request Timer",
+        code: `public class RequestTimingMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public RequestTimingMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        Console.WriteLine($"→ {context.Request.Method} {context.Request.Path}");
+
+        await _next(context); // Chuyển sang middleware tiếp theo
+
+        sw.Stop();
+        Console.WriteLine($"← Hoàn tất {sw.ElapsedMilliseconds}ms [Status: {context.Response.StatusCode}]");
+    }
+}
+
+// Đăng ký trong Program.cs:
+// app.UseMiddleware<RequestTimingMiddleware>();
+
+// Hoặc inline:
+app.Use(async (ctx, next) => {
+    Console.WriteLine($"→ Request bắt đầu: {ctx.Request.Path}");
+    await next(ctx);
+    Console.WriteLine($"← Response: {ctx.Response.StatusCode}");
+});`,
+        note: "Thứ tự đăng ký middleware QUAN TRỌNG: app.UseAuthentication() PHẢI đứng trước app.UseAuthorization()."
+      },
+      {
+        title: "JWT Bearer Authentication cơ bản",
+        code: `// Program.cs
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer   = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer   = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+        };
+    });
+
+app.UseAuthentication(); // Phải trước UseAuthorization!
+app.UseAuthorization();
+
+// Controller
+[ApiController, Route("api/[controller]")]
+[Authorize] // Yêu cầu JWT token hợp lệ
+public class OrdersController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult GetOrders() => Ok("Danh sách đơn hàng bí mật!");
+
+    [HttpGet("public"), AllowAnonymous] // Endpoint công khai
+    public IActionResult GetInfo() => Ok("Thông tin công khai");
+}`,
+        note: "Lưu Jwt:SecretKey trong User Secrets hoặc Azure Key Vault — KHÔNG commit secret vào Git!"
+      }
+    ],
+    practice: {
+      question: "Viết một inline middleware dùng `app.Use()` để thêm header `X-App-Name: CSharpMasteryLab` vào mọi response. Cần gọi `context.Response.Headers.Append()` và `await next(context)`.",
+      starter: `app.Use(async (context, next) =>
+{
+    // Thêm header X-App-Name vào response
+    context.Response.Headers.Append("X-App-Name", /* giá trị */);
+    await next(/* context */);
+});`,
+      requiredTokens: ["context.Response.Headers.Append(\"X-App-Name\"", "await next(context)"],
+      forbiddenTokens: [],
+      hint: "Dùng context.Response.Headers.Append(\"X-App-Name\", \"CSharpMasteryLab\") rồi gọi await next(context).",
+      success: "Xuất sắc! Custom middleware là cách mạnh mẽ nhất để áp dụng cross-cutting concerns trong ASP.NET Core.",
+      solution: `app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("X-App-Name", "CSharpMasteryLab");
+    await next(context);
+});`
+    },
+    quiz: [
+      {
+        q: "Tại sao app.UseAuthentication() PHẢI đứng trước app.UseAuthorization()?",
+        options: [
+          "Chỉ là convention, thứ tự không quan trọng",
+          "Authentication xác thực danh tính trước, Authorization mới có thể kiểm tra quyền hạn dựa trên danh tính đó",
+          "Vì Authorization nhanh hơn nên để sau",
+          "ASP.NET Core tự động sắp xếp lại"
+        ],
+        answer: 1,
+        explain: "Authentication phải chạy trước để xác định 'bạn là ai' (parse JWT, set HttpContext.User). Authorization sau đó mới kiểm tra 'bạn có quyền không' dựa trên User đã set."
+      }
+    ]
+  },
+  {
+    id: "ef-migrations",
+    module: "5. Entity Framework Core",
+    title: "EF Core Migrations, Code-First & Fluent API",
+    minutes: 35,
+    level: "Trung bình",
+    tags: ["EFCore", "Migrations", "FluentAPI", "CodeFirst", "DbContext", "Schema"],
+    short: "Làm chủ Code-First với EF Core: thiết kế entity, cấu hình schema bằng Fluent API và quản lý database migration an toàn.",
+    goals: [
+      "Tạo và cấu hình Entity class đúng chuẩn (required properties, navigation properties).",
+      "Dùng Fluent API trong OnModelCreating để cấu hình schema: tên bảng, index, unique constraint, foreign key.",
+      "Tạo và áp dụng migration an toàn với dotnet ef migrations add và dotnet ef database update."
+    ],
+    explain: [
+      "1. Code-First vs DB-First: Code-First: bạn viết C# class trước, EF tự tạo DB schema từ đó. Với dự án mới, Code-First là lựa chọn tốt hơn để version control schema qua Git.",
+      "2. Fluent API vs Data Annotations: Data Annotations ([Required], [MaxLength]) tiện nhưng hạn chế. Fluent API trong OnModelCreating() mạnh hơn, không pha trộn logic persistence vào domain model.",
+      "3. Migration là gì? Là snapshot sự thay đổi schema theo thời gian, lưu thành file C#. EF theo dõi migration nào đã apply bằng bảng __EFMigrationsHistory.",
+      "4. Các lệnh EF CLI: dotnet ef migrations add <Tên> — tạo migration. dotnet ef database update — áp dụng. dotnet ef migrations remove — xóa migration cuối nếu chưa apply."
+    ],
+    analogy: "Migration giống như hệ thống version control (Git) nhưng cho database schema. Mỗi lần thêm cột, đổi tên bảng, thêm index là một 'commit schema'. Có thể rollback về bất kỳ version nào an toàn.",
+    code: [
+      {
+        title: "Entity + DbContext với Fluent API Configuration",
+        code: `public class Order
+{
+    public int      Id          { get; set; }
+    public string   OrderCode   { get; set; } = "";
+    public decimal  TotalAmount { get; set; }
+    public string   Status      { get; set; } = "Pending";
+    public DateTime CreatedAt   { get; set; } = DateTime.UtcNow;
+    public int      CustomerId  { get; set; }
+    public Customer Customer    { get; set; } = null!;
+    public List<OrderItem> Items { get; set; } = new();
+}
+
+public class AppDbContext : DbContext
+{
+    public DbSet<Order>    Orders    { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Orders");
+            entity.HasKey(o => o.Id);
+
+            entity.Property(o => o.OrderCode)
+                  .IsRequired()
+                  .HasMaxLength(20);
+
+            entity.Property(o => o.TotalAmount)
+                  .HasColumnType("decimal(18, 2)"); // Chuẩn tiền tệ
+
+            entity.HasIndex(o => o.OrderCode).IsUnique();
+
+            entity.HasOne(o => o.Customer)
+                  .WithMany(c => c.Orders)
+                  .HasForeignKey(o => o.CustomerId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+    }
+}`,
+        note: "Luôn dùng HasColumnType(\"decimal(18, 2)\") cho cột tiền tệ để tránh sai số trên các DB khác nhau."
+      }
+    ],
+    practice: {
+      question: "Trong OnModelCreating, cấu hình entity `Product` với Fluent API: đặt tên bảng là `Products`, property `Name` là required với max length 100, property `Price` dùng column type `decimal(18,2)`.",
+      starter: `protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<Product>(entity =>
+    {
+        entity.ToTable(/* "Products" */);
+
+        entity.Property(p => p.Name)
+              .IsRequired()
+              .HasMaxLength(/* 100 */);
+
+        entity.Property(p => p.Price)
+              .HasColumnType(/* "decimal(18,2)" */);
+    });
+}`,
+      requiredTokens: ["entity.ToTable(\"Products\")", ".IsRequired()", ".HasMaxLength(100)", "decimal(18,2)"],
+      forbiddenTokens: [],
+      hint: "Dùng entity.ToTable(\"Products\"), .IsRequired(), .HasMaxLength(100) và .HasColumnType(\"decimal(18,2)\").",
+      success: "Rất tốt! Fluent API giúp giữ domain entity thuần túy và cấu hình DB tập trung, dễ thay đổi.",
+      solution: `protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<Product>(entity =>
+    {
+        entity.ToTable("Products");
+        entity.Property(p => p.Name).IsRequired().HasMaxLength(100);
+        entity.Property(p => p.Price).HasColumnType("decimal(18,2)");
+    });
+}`
+    },
+    quiz: [
+      {
+        q: "Tại sao nên dùng Fluent API thay vì Data Annotations trong các dự án lớn?",
+        options: [
+          "Data Annotations không hoạt động trong EF Core",
+          "Fluent API nhanh hơn khi truy vấn database",
+          "Fluent API tập trung cấu hình persistence vào DbContext, giữ domain entity thuần túy không phụ thuộc EF",
+          "Data Annotations không hỗ trợ Index"
+        ],
+        answer: 2,
+        explain: "Fluent API tuân thủ Separation of Concerns: domain model không bị ô nhiễm bởi attribute của EF. Toàn bộ cấu hình DB nằm ở DbContext, dễ duy trì và unit test hơn."
+      }
+    ]
+  },
+  {
+    id: "ef-repository",
+    module: "5. Entity Framework Core",
+    title: "Repository Pattern, Unit of Work & EF Core Performance",
+    minutes: 40,
+    level: "Nâng cao",
+    tags: ["Repository", "UnitOfWork", "EFCore", "AsNoTracking", "Performance", "N+1"],
+    short: "Xây dựng Data Access Layer chuẩn kiến trúc: Generic Repository + Unit of Work. Tối ưu với AsNoTracking, Include() và tránh bẫy N+1 Query.",
+    goals: [
+      "Implement Generic Repository<T> để CRUD an toàn với EF Core.",
+      "Dùng Unit of Work pattern để đảm bảo tính atomic (commit hoặc rollback toàn bộ thay đổi).",
+      "Phát hiện và giải quyết N+1 Query Problem bằng .Include() hoặc Projection."
+    ],
+    explain: [
+      "1. Repository Pattern: Trừu tượng hóa tầng truy cập dữ liệu. Business logic chỉ làm việc với IRepository<T>, không biết bên dưới là EF Core, Dapper hay MongoDB. Dễ unit test vì có thể mock IRepository.",
+      "2. Unit of Work: Đóng gói nhiều Repository trong cùng 1 DbContext transaction. Khi gọi CommitAsync(), EF gộp tất cả thay đổi và SaveChangesAsync() một lần duy nhất — đảm bảo tính atomic.",
+      "3. N+1 Query Problem: Nếu truy vấn 100 đơn hàng rồi vòng lặp để lấy Customer của mỗi đơn → EF thực hiện 1 + 100 = 101 câu SQL! Giải pháp: .Include(o => o.Customer) để JOIN trong 1 câu SQL.",
+      "4. AsNoTracking(): Với query chỉ đọc (không update), thêm .AsNoTracking() để EF không lưu vào Change Tracker. Nhanh hơn ~30% và ít tốn RAM hơn — đặc biệt quan trọng với query trả về nhiều bản ghi."
+    ],
+    analogy: "Unit of Work giống như giỏ hàng siêu thị: bỏ nhiều món vào giỏ (nhiều thao tác DB), ra quầy thanh toán một lần (CommitAsync). Nếu thẻ bị từ chối (lỗi), tất cả món hàng đều được hoàn lại kệ (rollback).",
+    code: [
+      {
+        title: "Generic Repository & Unit of Work + Tránh N+1",
+        code: `// Generic Repository Interface
+public interface IRepository<T> where T : class
+{
+    Task<T?> GetByIdAsync(int id);
+    Task<IEnumerable<T>> GetAllAsync();
+    Task AddAsync(T entity);
+    void Update(T entity);
+    void Delete(T entity);
+}
+
+// EF Core Implementation
+public class EfRepository<T> : IRepository<T> where T : class
+{
+    protected readonly AppDbContext _db;
+    protected readonly DbSet<T>     _set;
+
+    public EfRepository(AppDbContext db) { _db = db; _set = db.Set<T>(); }
+
+    public async Task<T?> GetByIdAsync(int id) => await _set.FindAsync(id);
+    public async Task<IEnumerable<T>> GetAllAsync()
+        => await _set.AsNoTracking().ToListAsync(); // Chỉ đọc → AsNoTracking
+    public async Task AddAsync(T entity) => await _set.AddAsync(entity);
+    public void Update(T entity) => _set.Update(entity);
+    public void Delete(T entity) => _set.Remove(entity);
+}
+
+// Unit of Work
+public class UnitOfWork : IDisposable
+{
+    private readonly AppDbContext _db;
+    public IRepository<Order>    Orders    { get; }
+    public IRepository<Customer> Customers { get; }
+
+    public UnitOfWork(AppDbContext db)
+    {
+        _db = db;
+        Orders    = new EfRepository<Order>(db);
+        Customers = new EfRepository<Customer>(db);
+    }
+
+    public async Task<int> CommitAsync() => await _db.SaveChangesAsync();
+    public void Dispose() => _db.Dispose();
+}
+
+// Giải quyết N+1: Luôn .Include() khi cần navigation property
+var orders = await _db.Orders
+    .Include(o => o.Customer)  // Tránh N+1 — JOIN trong 1 câu SQL
+    .Include(o => o.Items)
+    .AsNoTracking()            // Chỉ đọc
+    .Where(o => o.Status == "Paid")
+    .ToListAsync();`,
+        note: "Đặt AsNoTracking() TRƯỚC Where() và ToListAsync() để đảm bảo toàn bộ query được tối ưu từ đầu."
+      }
+    ],
+    practice: {
+      question: "Viết EF Core query lấy đơn hàng có Status == \"Paid\", include Customer navigation property, và dùng AsNoTracking() vì query chỉ đọc. Gán vào `var orders`.",
+      starter: `var orders = await _db.Orders
+    .Include(o => /* o.Customer */)
+    .AsNoTracking()
+    .Where(o => o.Status == "Paid")
+    .ToListAsync();`,
+      requiredTokens: ["Include(o => o.Customer)", "AsNoTracking()"],
+      forbiddenTokens: [],
+      hint: "Dùng .Include(o => o.Customer) để tránh N+1 query, và .AsNoTracking() vì query này chỉ để đọc.",
+      success: "Tuyệt vời! AsNoTracking + Include là combo tối ưu không thể thiếu với EF Core đọc dữ liệu.",
+      solution: `var orders = await _db.Orders
+    .Include(o => o.Customer)
+    .AsNoTracking()
+    .Where(o => o.Status == "Paid")
+    .ToListAsync();`
+    },
+    quiz: [
+      {
+        q: "N+1 Query Problem xảy ra khi nào và gây hậu quả gì?",
+        options: [
+          "Khi có 2 bảng join với nhau",
+          "Khi query 1 danh sách rồi vòng lặp để lazy-load từng navigation property → thực thi N+1 câu SQL riêng lẻ, rất chậm",
+          "Khi dùng AsNoTracking()",
+          "Khi SaveChanges() được gọi nhiều lần"
+        ],
+        answer: 1,
+        explain: "N+1: 1 câu SELECT lấy danh sách + N câu SELECT lấy từng liên quan. 100 đơn hàng → 101 câu SQL! Giải pháp: .Include() để EF dùng 1 câu SQL với JOIN."
+      }
+    ]
+  },
+  {
+    id: "pattern-matching-adv",
+    module: "7. Modern C# Features",
+    title: "Pattern Matching Nâng cao: Switch Expression, Property & List Pattern",
+    minutes: 30,
+    level: "Trung bình",
+    tags: ["PatternMatching", "SwitchExpression", "PropertyPattern", "ListPattern", "ModernCSharp"],
+    short: "Khai thác Pattern Matching trong C# 9-12: switch expression ngắn gọn, property pattern kiểm tra nhiều trường cùng lúc, list pattern xử lý mảng.",
+    goals: [
+      "Thay thế if/else và switch statement dài dòng bằng switch expression tổng hợp.",
+      "Dùng property pattern { Prop: value } để phân nhánh theo nhiều thuộc tính của object.",
+      "Áp dụng list pattern [first, .., last] để kiểm tra cấu trúc mảng/list (C# 11+)."
+    ],
+    explain: [
+      "1. Switch Expression (C# 8+): Thay switch statement bằng expression một dòng với =>. Mỗi arm là pattern => result. Dấu _ là default arm (wildcard).",
+      "2. Property Pattern: Kiểm tra nhiều property cùng lúc: order is { Status: \"Paid\", Amount: > 500_000 }. Có thể lồng nhau: order is { Customer: { Tier: \"VIP\" } }.",
+      "3. Type Pattern + When Guard: Kết hợp kiểm tra kiểu và điều kiện thêm trong switch expression.",
+      "4. List Pattern (C# 11+): Khớp với cấu trúc danh sách. [var first, .., var last] — first là phần tử đầu, last là phần tử cuối, .. là các phần tử ở giữa."
+    ],
+    analogy: "Pattern Matching như bảng lọc thông minh của quầy giao hàng: nhìn vào kiện hàng (object), kiểm tra nhiều dấu hiệu cùng lúc (size, weight, label) rồi chuyển ngay đến ô đúng — thay vì phải mở ra kiểm tra từng thứ một.",
+    code: [
+      {
+        title: "Switch Expression & Property Pattern thực chiến",
+        code: `public record Order(string Status, decimal Amount, string CustomerTier);
+
+// Switch Expression với Property Pattern
+static decimal GetProcessingFee(Order order) => order switch
+{
+    { Status: "Urgent", CustomerTier: "VIP" }    => 0m,        // VIP + Urgent: miễn phí
+    { Status: "Urgent", Amount: > 1_000_000m }   => 50_000m,   // Urgent, đơn lớn
+    { Status: "Urgent" }                          => 100_000m,  // Urgent thông thường
+    { CustomerTier: "VIP" }                       => 0m,        // VIP: miễn phí
+    { Amount: >= 500_000m }                       => 20_000m,   // Đơn trung bình
+    _                                             => 30_000m    // Mặc định
+};
+
+Console.WriteLine(GetProcessingFee(new Order("Urgent", 2_000_000m, "VIP")));   // 0
+Console.WriteLine(GetProcessingFee(new Order("Normal", 300_000m, "Standard"))); // 30000
+
+// List Pattern (C# 11+)
+string[] args = ["--env", "production", "--port", "8080"];
+
+if (args is ["--env", var env, "--port", var port])
+    Console.WriteLine($"Môi trường: {env}, Port: {port}");
+
+if (args is [var first, .., var last]) // Bất kỳ độ dài nào
+    Console.WriteLine($"Đầu tiên: {first}, Cuối cùng: {last}");`,
+        note: "Pattern matching arm được kiểm tra từ trên xuống dưới. Đặt pattern cụ thể nhất ở trên, pattern chung hơn ở dưới."
+      }
+    ],
+    practice: {
+      question: "Viết switch expression phân loại đơn hàng: `>= 1_000_000m` → trả về \"Premium\", `>= 500_000m` → \"Standard\", còn lại → \"Basic\". Tham số là `decimal amount`.",
+      starter: `string ClassifyOrder(decimal amount) => amount switch
+{
+    /* >= 1_000_000m */ => "Premium",
+    /* >= 500_000m   */ => "Standard",
+    /* default       */ => "Basic"
+};`,
+      requiredTokens: [">= 1_000_000m", ">= 500_000m", "\"Premium\"", "\"Standard\"", "\"Basic\""],
+      forbiddenTokens: [],
+      hint: "Dùng relational pattern trong switch expression: `>= 1_000_000m => \"Premium\"`.",
+      success: "Xuất sắc! Switch expression ngắn gọn và biểu đạt hơn if/else chain rất nhiều — đây là C# hiện đại!",
+      solution: `string ClassifyOrder(decimal amount) => amount switch
+{
+    >= 1_000_000m => "Premium",
+    >= 500_000m   => "Standard",
+    _             => "Basic"
+};`
+    },
+    quiz: [
+      {
+        q: "Trong switch expression, ký tự `_` (dấu gạch dưới) dùng để làm gì?",
+        options: [
+          "Đặt tên biến tạm thời",
+          "Default arm — khớp với mọi giá trị không khớp bất kỳ arm nào ở trên",
+          "Bỏ qua kết quả của expression",
+          "Pattern khớp với giá trị null"
+        ],
+        answer: 1,
+        explain: "_ là discard pattern (wildcard), khớp với mọi giá trị. Đặt ở cuối switch expression như default case. Nếu không có _ và không arm nào khớp, sẽ ném MatchFailedException."
+      }
+    ]
+  },
+  {
+    id: "unit-testing-xunit",
+    module: "8. Dự án Tổng hợp",
+    title: "Unit Testing với xUnit, Moq & Test-Driven Development",
+    minutes: 40,
+    level: "Trung bình",
+    tags: ["UnitTest", "xUnit", "Moq", "TDD", "AAA", "Mocking"],
+    short: "Viết Unit Test chuẩn với xUnit theo pattern AAA (Arrange-Act-Assert). Mock dependency bằng Moq để test business logic độc lập với DB và HTTP.",
+    goals: [
+      "Viết test case chuẩn mực với [Fact] và [Theory] trong xUnit.",
+      "Áp dụng pattern AAA: Arrange (chuẩn bị dữ liệu) → Act (thực thi) → Assert (kiểm tra kết quả).",
+      "Mock dependency (repository, HTTP client) bằng Moq để test business logic trong isolation."
+    ],
+    explain: [
+      "1. Unit Test là gì? Test một đơn vị code nhỏ (method/class) trong hoàn toàn cô lập — không cần DB, không cần HTTP, không cần file system. Chạy cực nhanh (<1ms/test) và reproducible 100%.",
+      "2. [Fact] vs [Theory]: [Fact] là test không tham số, chạy 1 lần. [Theory] + [InlineData] là test chạy nhiều lần với các bộ dữ liệu khác nhau — cực hữu ích để test edge cases.",
+      "3. Pattern AAA: Arrange: tạo object, chuẩn bị input. Act: gọi method cần test. Assert: kiểm tra kết quả với Assert.Equal, Assert.Throws, Assert.True...",
+      "4. Moq — Mock object: Giả lập dependency. mock.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(fakeOrder) → khi code gọi repository.GetByIdAsync(1), nó nhận về dữ liệu giả không cần DB thật."
+    ],
+    analogy: "Unit Test như kiểm thử từng con ốc vít trong nhà máy trước khi lắp ráp. Moq (Mock) như bộ phận giả: test hệ thống phanh xe mà không cần bánh xe thật — chỉ cần 'giả lập' bánh xe phản hồi đúng lực.",
+    code: [
+      {
+        title: "xUnit Test chuẩn mực với Moq — Pattern AAA",
+        code: `// Cài nuget: xunit, xunit.runner.visualstudio, Moq
+using Xunit;
+using Moq;
+
+public class OrderService
+{
+    private readonly IOrderRepository _repo;
+    public OrderService(IOrderRepository repo) => _repo = repo;
+
+    public async Task<decimal> GetOrderTotalAsync(int orderId)
+    {
+        var order = await _repo.GetByIdAsync(orderId);
+        if (order is null) throw new KeyNotFoundException($"Order {orderId} không tồn tại");
+        return order.TotalAmount;
+    }
+}
+
+public class OrderServiceTests
+{
+    [Fact]
+    public async Task GetOrderTotal_WithValidId_ReturnsCorrectAmount()
+    {
+        // ARRANGE
+        var fakeOrder = new Order { Id = 1, TotalAmount = 350_000m };
+        var mockRepo  = new Mock<IOrderRepository>();
+        mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(fakeOrder);
+        var service = new OrderService(mockRepo.Object);
+
+        // ACT
+        var result = await service.GetOrderTotalAsync(1);
+
+        // ASSERT
+        Assert.Equal(350_000m, result);
+        mockRepo.Verify(r => r.GetByIdAsync(1), Times.Once());
+    }
+
+    [Theory]
+    [InlineData(100_000, "Basic")]
+    [InlineData(600_000, "Standard")]
+    [InlineData(1_500_000, "Premium")]
+    public void ClassifyOrder_WithVariousAmounts_ReturnsCorrectTier(
+        decimal amount, string expectedTier)
+    {
+        // Test nhiều bộ dữ liệu với [Theory]
+        Assert.True(amount > 0, "Amount phải dương");
+    }
+
+    [Fact]
+    public async Task GetOrderTotal_WithInvalidId_ThrowsKeyNotFoundException()
+    {
+        var mockRepo = new Mock<IOrderRepository>();
+        mockRepo.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((Order?)null);
+        var service = new OrderService(mockRepo.Object);
+
+        await Assert.ThrowsAsync<KeyNotFoundException>(
+            () => service.GetOrderTotalAsync(999));
+    }
+}`,
+        note: "Tên test method theo pattern: MethodName_Scenario_ExpectedBehavior. VD: GetOrderTotal_WithInvalidId_ThrowsException."
+      }
+    ],
+    practice: {
+      question: "Viết một [Fact] test method `Add_TwoNumbers_ReturnsSum()` kiểm tra class `Calculator` có phương thức `Add(int a, int b)`. Dùng pattern AAA: tạo Calculator, gọi Add(3, 4), Assert.Equal(7, result).",
+      starter: `public class CalculatorTests
+{
+    [Fact]
+    public void Add_TwoNumbers_ReturnsSum()
+    {
+        // Arrange
+        var calc = new Calculator();
+
+        // Act
+        var result = calc.Add(3, 4);
+
+        // Assert
+        Assert.Equal(/* 7 */, result);
+    }
+}`,
+      requiredTokens: ["[Fact]", "calc.Add(3, 4)", "Assert.Equal(7, result)"],
+      forbiddenTokens: [],
+      hint: "Gọi calc.Add(3, 4) trong phần Act và Assert.Equal(7, result) trong phần Assert.",
+      success: "Xuất sắc! Bạn đã viết unit test chuẩn mực. Đây là kỹ năng phân biệt Junior và Senior Developer!",
+      solution: `public class CalculatorTests
+{
+    [Fact]
+    public void Add_TwoNumbers_ReturnsSum()
+    {
+        // Arrange
+        var calc = new Calculator();
+
+        // Act
+        var result = calc.Add(3, 4);
+
+        // Assert
+        Assert.Equal(7, result);
+    }
+}`
+    },
+    quiz: [
+      {
+        q: "Mục đích của Moq (Mock object) trong Unit Testing là gì?",
+        options: [
+          "Tăng tốc độ compile của ứng dụng",
+          "Giả lập các dependency (DB, HTTP, Repository) để test business logic trong hoàn toàn cô lập không cần infrastructure thật",
+          "Tạo dữ liệu giả cho môi trường production",
+          "Thay thế xUnit framework"
+        ],
+        answer: 1,
+        explain: "Mock cho phép thay thế dependency nặng (DB, API, file system) bằng object giả kiểm soát được. Business logic được test trong isolation — chạy nhanh, không có side effect, kết quả deterministic."
+      }
+    ]
   }
 ];
 
@@ -3701,6 +5279,11 @@ const state = {
   completedLessons: new Set(JSON.parse(localStorage.getItem("csharp_completed_lessons") || "[]")),
   notes: JSON.parse(localStorage.getItem("csharp_lesson_notes") || "{}"),
   theme: localStorage.getItem("csharp_theme") || "dark",
+  // BOOKMARKS & STREAK & ROADMAP TRACK
+  bookmarks: new Set(JSON.parse(localStorage.getItem("csharp_bookmarks") || "[]")),
+  streak: JSON.parse(localStorage.getItem("csharp_streak") || '{"days":0,"lastDate":""}'),
+  levelFilter: "All",
+  activeTrack: localStorage.getItem("csharp_active_track") || "full",
   // GEMINI MULTI-KEY MANAGEMENT
   apiKeys: (function() {
     const saved = localStorage.getItem("csharp_gemini_api_keys");
@@ -3715,6 +5298,30 @@ const state = {
   currentKeyIndex: 0,
   selectedModel: localStorage.getItem("csharp_gemini_model") || "gemini-2.5-flash",
   chatHistory: [] // current session chat messages
+};
+
+// LEARNING TRACK DEFINITIONS
+const LEARNING_TRACKS = {
+  modern: {
+    name: "C# Modern Refresher",
+    icon: "🚀",
+    lessonIds: ["csharp-variables-types", "csharp-oop-mastery", "records-pattern-matching", "pattern-matching-adv", "csharp12-collection-primary", "linq-methods", "linq-advanced"]
+  },
+  performance: {
+    name: "Async & High Performance",
+    icon: "⚡",
+    lessonIds: ["async-await-core", "task-whenall", "cancellation-token", "parallel-semaphore", "span-memory", "benchmark-dotnet"]
+  },
+  enterprise: {
+    name: "Web API & Enterprise Architecture",
+    icon: "🏢",
+    lessonIds: ["di-lifetimes", "middleware-jwt", "ef-migrations", "ef-repository", "unit-testing-xunit", "capstone"]
+  },
+  full: {
+    name: "Toàn diện từ Số 0 đến Kiến trúc sư",
+    icon: "🎓",
+    lessonIds: []
+  }
 };
 
 // DOM SHORTCUTS
@@ -3743,6 +5350,14 @@ const el = {
   floatingAiBtn: $("floatingAiBtn"),
   toggleAiBtn: $("toggleAiBtn"),
   toggleSidebarBtn: $("toggleSidebarBtn"),
+  // Roadmap & CheatSheet Modals
+  openRoadmapBtn: $("openRoadmapBtn"),
+  roadmapModal: $("roadmapModal"),
+  closeRoadmapModalBtn: $("closeRoadmapModalBtn"),
+  openCheatSheetBtn: $("openCheatSheetBtn"),
+  cheatSheetModal: $("cheatSheetModal"),
+  closeCheatSheetModalBtn: $("closeCheatSheetModalBtn"),
+  toastContainer: $("toastContainer"),
   // Mobile DOMs
   hamburgerBtn: $("hamburgerBtn"),
   sidebar: $("sidebar"),
@@ -3759,6 +5374,18 @@ const el = {
   modelSelect: $("modelSelect"),
   keyStatusList: $("keyStatusList")
 };
+
+function showToast(msg, icon = "💡") {
+  const container = el.toastContainer || document.getElementById("toastContainer");
+  if (!container) return;
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `<span>${icon}</span> <span>${escapeHtml(msg)}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    if (toast.parentNode) toast.remove();
+  }, 3000);
+}
 
 /* ==========================================================================
    INITIALIZATION & THEME
@@ -3778,6 +5405,8 @@ function saveState() {
   localStorage.setItem("csharp_lesson_notes", JSON.stringify(state.notes));
   localStorage.setItem("csharp_gemini_api_keys", JSON.stringify(state.apiKeys));
   localStorage.setItem("csharp_gemini_model", state.selectedModel);
+  localStorage.setItem("csharp_bookmarks", JSON.stringify([...state.bookmarks]));
+  localStorage.setItem("csharp_streak", JSON.stringify(state.streak));
 }
 
 function getCurrentLesson() {
@@ -3791,6 +5420,36 @@ function updateProgressUI() {
   el.progressText.textContent = `${done}/${total} bài học`;
   el.progressPercent.textContent = `${pct}% Hoàn thành`;
   el.progressBar.style.width = `${pct}%`;
+  // Update sidebar count
+  const countEl = document.getElementById("sidebarCountLabel");
+  if (countEl) countEl.textContent = total;
+}
+
+function updateStreakUI() {
+  const streakBadge = document.getElementById("streakBadge");
+  const streakCount = document.getElementById("streakCount");
+  if (!streakBadge || !streakCount) return;
+  if (state.streak.days >= 2) {
+    streakBadge.style.display = "inline-flex";
+    streakCount.textContent = state.streak.days;
+  } else {
+    streakBadge.style.display = "none";
+  }
+}
+
+function checkAndUpdateStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  const last = state.streak.lastDate;
+  if (last === today) return; // Đã cập nhật hôm nay
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  if (last === yesterday) {
+    state.streak.days += 1; // Tiếp tục streak
+  } else if (last !== today) {
+    state.streak.days = 1; // Bắt đầu lại
+  }
+  state.streak.lastDate = today;
+  saveState();
+  updateStreakUI();
 }
 
 function escapeHtml(str = "") {
@@ -3808,12 +5467,19 @@ function renderSidebar(searchQuery = "") {
     const textSearch = `${l.title} ${l.short} ${l.module} ${l.tags.join(" ")}`.toLowerCase();
     if (q && !textSearch.includes(q)) return;
 
+    // Level & Bookmark filter
+    if (state.levelFilter === "Bookmark") {
+      if (!state.bookmarks.has(l.id)) return;
+    } else if (state.levelFilter !== "All") {
+      if (l.level !== state.levelFilter) return;
+    }
+
     if (!groups.has(l.module)) groups.set(l.module, []);
     groups.get(l.module).push(l);
   });
 
   if (groups.size === 0) {
-    el.moduleNav.innerHTML = `<div style="padding: 16px; color: var(--muted); font-size: 13px;">Không tìm thấy bài học nào phù hợp với từ khóa "${escapeHtml(searchQuery)}".</div>`;
+    el.moduleNav.innerHTML = `<div style="padding: 16px; color: var(--muted); font-size: 13px;">Không tìm thấy bài học nào phù hợp với bộ lọc hiện tại.</div>`;
     return;
   }
 
@@ -3827,11 +5493,15 @@ function renderSidebar(searchQuery = "") {
         ${lessons.map(l => {
           const isActive = l.id === state.currentLessonId;
           const isDone = state.completedLessons.has(l.id);
+          const isBookmarked = state.bookmarks.has(l.id);
           return `
             <button class="lesson-item-btn ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}" data-lesson-id="${l.id}">
               <span class="lesson-status-icon">${isDone ? '✓' : ''}</span>
               <span class="lesson-item-title" title="${escapeHtml(l.title)}">${escapeHtml(l.title)}</span>
-              <span class="lesson-item-badge">${l.minutes}'</span>
+              <span style="display:flex;align-items:center;gap:3px;flex-shrink:0;">
+                ${isBookmarked ? '<span title="Yêu thích" style="font-size:10px;">⭐</span>' : ''}
+                <span class="lesson-item-badge">${l.minutes}'</span>
+              </span>
             </button>
           `;
         }).join("")}
@@ -3853,23 +5523,65 @@ function renderLesson() {
 
   el.aiLessonContextTitle.textContent = l.title;
 
+  const currentIndex = window.LESSONS.findIndex(x => x.id === l.id);
+  const prevLesson = currentIndex > 0 ? window.LESSONS[currentIndex - 1] : null;
+  const nextLesson = currentIndex < window.LESSONS.length - 1 ? window.LESSONS[currentIndex + 1] : null;
+
+  const levelClassMap = {
+    "Vỡ lòng": "badge-level-volong",
+    "Cơ bản": "badge-level-coban",
+    "Trung bình": "badge-level-trungbinh",
+    "Nâng cao": "badge-level-nangcao",
+    "Tổng hợp": "badge-level-tonghop"
+  };
+  const levelBadgeClass = levelClassMap[l.level] || "purple";
+
   el.contentWrapper.innerHTML = `
     <!-- HERO HEADER -->
     <section class="hero-card">
+      <div class="hero-top-row">
+        <div class="hero-breadcrumb">
+          <span>📚 Lộ trình</span>
+          <span>›</span>
+          <span class="bc-mod">${escapeHtml(l.module)}</span>
+          <span>›</span>
+          <span style="color: var(--ink); font-weight: 700;">${escapeHtml(l.title)}</span>
+        </div>
+        <div class="hero-nav-actions">
+          ${prevLesson ? `<button id="prevLessonHeroBtn" class="hero-nav-btn" data-id="${prevLesson.id}" title="Bài trước: ${escapeHtml(prevLesson.title)}">⏮ Bài trước</button>` : ''}
+          ${nextLesson ? `<button id="nextLessonHeroBtn" class="hero-nav-btn" data-id="${nextLesson.id}" title="Bài sau: ${escapeHtml(nextLesson.title)}">Bài sau ⏭</button>` : ''}
+        </div>
+      </div>
+
       <div class="hero-badges">
         <span class="badge-pill accent">${escapeHtml(l.module)}</span>
-        <span class="badge-pill purple">${escapeHtml(l.level)}</span>
+        <span class="badge-pill ${levelBadgeClass}">${escapeHtml(l.level)}</span>
         <span class="badge-pill">⏱ ${l.minutes} Phút học</span>
         ${l.tags.map(t => `<span class="badge-pill">#${escapeHtml(t)}</span>`).join("")}
+        <button id="bookmarkLessonBtn" class="bookmark-btn ${state.bookmarks.has(l.id) ? 'bookmarked' : ''}" title="Đánh dấu yêu thích bài học này">
+          ${state.bookmarks.has(l.id) ? '⭐ Đã lưu' : '☆ Lưu bài'}
+        </button>
       </div>
       <h1 class="hero-title">${escapeHtml(l.title)}</h1>
       <p class="hero-desc">${escapeHtml(l.short)}</p>
     </section>
 
+    <!-- KEY TAKEAWAYS (30s REFRESHER BOX CHO NGƯỜI QUAY LẠI C#) -->
+    <div class="key-takeaway-card">
+      <div class="key-takeaway-header">
+        <span>⚡</span>
+        <span>Điểm cốt lõi 30s (Dành cho người quay lại C#)</span>
+        <span class="key-takeaway-badge">Quick Review</span>
+      </div>
+      <ul class="key-takeaway-list">
+        ${l.goals.slice(0, 3).map(g => `<li>${escapeHtml(g)}</li>`).join("")}
+      </ul>
+    </div>
+
     <!-- 1. GOALS -->
     <section class="section-card">
       <div class="section-header">
-        <h2>🎯 Mục tiêu sau bài học</h2>
+        <h2>🎯 Chi tiết Mục tiêu</h2>
       </div>
       <ul class="goals-list">
         ${l.goals.map(g => `<li>${escapeHtml(g)}</li>`).join("")}
@@ -4038,21 +5750,57 @@ function renderLesson() {
   `;
 
   bindLessonEvents(l);
+
+  // Apply Prism.js syntax highlighting to all code blocks
+  if (window.Prism) {
+    document.querySelectorAll("pre code").forEach(block => {
+      block.className = "language-csharp";
+    });
+    Prism.highlightAll();
+  }
 }
 
 /* ==========================================================================
    BIND EVENTS IN LESSON
    ========================================================================== */
 function bindLessonEvents(lesson) {
+  // Hero navigation buttons
+  const prevBtn = $("prevLessonHeroBtn");
+  if (prevBtn) prevBtn.onclick = () => selectLesson(prevBtn.dataset.id);
+  const nextBtn = $("nextLessonHeroBtn");
+  if (nextBtn) nextBtn.onclick = () => selectLesson(nextBtn.dataset.id);
+
   // Copy code buttons
   document.querySelectorAll("[data-copy-idx]").forEach(btn => {
     btn.onclick = async () => {
       const idx = +btn.dataset.copyIdx;
       await copyToClipboard(lesson.code[idx].code);
       btn.textContent = "Đã chép ✓";
+      showToast("Đã sao chép đoạn code C# vào bộ nhớ tạm!", "📋");
       setTimeout(() => btn.textContent = "Sao chép", 1500);
     };
   });
+
+  // Bookmark button toggle
+  const bookmarkBtn = $("bookmarkLessonBtn");
+  if (bookmarkBtn) {
+    bookmarkBtn.onclick = () => {
+      if (state.bookmarks.has(lesson.id)) {
+        state.bookmarks.delete(lesson.id);
+        bookmarkBtn.textContent = "☆ Lưu bài";
+        bookmarkBtn.classList.remove("bookmarked");
+        showToast("Đã bỏ lưu bài học", "☆");
+      } else {
+        state.bookmarks.add(lesson.id);
+        bookmarkBtn.textContent = "⭐ Đã lưu";
+        bookmarkBtn.classList.add("bookmarked");
+        showToast("Đã lưu bài học vào danh sách Yêu thích ⭐", "⭐");
+      }
+      saveState();
+      renderSidebar(el.searchInput.value);
+    };
+  }
+
 
   // Practice Editor Logic
   const editor = $("practiceCodeEditor");
@@ -4244,6 +5992,7 @@ ${userCode}
       state.completedLessons.delete(lesson.id);
     } else {
       state.completedLessons.add(lesson.id);
+      checkAndUpdateStreak(); // Cập nhật streak khi hoàn thành bài học
     }
     saveState();
     updateProgressUI();
@@ -4855,6 +6604,17 @@ function resetProgress() {
    ========================================================================== */
 function initEvents() {
   el.searchInput.oninput = (e) => renderSidebar(e.target.value);
+
+  // Level Filter Pills
+  document.querySelectorAll(".level-pill").forEach(pill => {
+    pill.onclick = () => {
+      document.querySelectorAll(".level-pill").forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      state.levelFilter = pill.dataset.level;
+      renderSidebar(el.searchInput.value);
+    };
+  });
+
   el.exportDataBtn.onclick = exportData;
   if (el.importDataBtn && el.importFileInput) {
     el.importDataBtn.onclick = () => el.importFileInput.click();
@@ -4920,6 +6680,52 @@ function initEvents() {
       el.tutorPanel.classList.remove("open");
     };
   }
+
+  // Roadmap Modal Handlers
+  if (el.openRoadmapBtn && el.roadmapModal) {
+    el.openRoadmapBtn.onclick = () => el.roadmapModal.classList.add("open");
+    if (el.closeRoadmapModalBtn) el.closeRoadmapModalBtn.onclick = () => el.roadmapModal.classList.remove("open");
+    el.roadmapModal.onclick = (e) => { if (e.target === el.roadmapModal) el.roadmapModal.classList.remove("open"); };
+  }
+
+  // Cheat Sheet Modal Handlers
+  if (el.openCheatSheetBtn && el.cheatSheetModal) {
+    el.openCheatSheetBtn.onclick = () => {
+      el.cheatSheetModal.classList.add("open");
+      if (window.Prism) Prism.highlightAll();
+    };
+    if (el.closeCheatSheetModalBtn) el.closeCheatSheetModalBtn.onclick = () => el.cheatSheetModal.classList.remove("open");
+    el.cheatSheetModal.onclick = (e) => { if (e.target === el.cheatSheetModal) el.cheatSheetModal.classList.remove("open"); };
+  }
+
+  // Cheat Sheet Tab Switcher
+  document.querySelectorAll(".cs-tab-btn").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll(".cs-tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".cs-tab-pane").forEach(p => p.style.display = "none");
+      btn.classList.add("active");
+      const pane = document.getElementById("csTab_" + btn.dataset.tab);
+      if (pane) pane.style.display = "block";
+      if (window.Prism) Prism.highlightAll();
+    };
+  });
+
+  // Learning Track Selector in Roadmap Modal
+  document.querySelectorAll(".track-btn").forEach(btn => {
+    btn.onclick = () => {
+      const trackKey = btn.dataset.track;
+      const track = LEARNING_TRACKS[trackKey];
+      if (track) {
+        state.activeTrack = trackKey;
+        localStorage.setItem("csharp_active_track", trackKey);
+        if (el.roadmapModal) el.roadmapModal.classList.remove("open");
+        showToast(`Đã chọn lộ trình: ${track.name}`, track.icon);
+        if (track.lessonIds && track.lessonIds.length > 0) {
+          selectLesson(track.lessonIds[0]);
+        }
+      }
+    };
+  });
 
   // Key modal
   el.openKeyModalBtn.onclick = openKeyModal;
@@ -5012,6 +6818,7 @@ initTheme();
 initEvents();
 updateProgressUI();
 updateKeyStatusUI();
+updateStreakUI();
 renderSidebar();
 renderLesson();
   </script>
