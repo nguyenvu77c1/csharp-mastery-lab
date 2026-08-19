@@ -1195,7 +1195,7 @@ pre {
   inset: 0;
   background: rgba(3, 7, 18, 0.8);
   backdrop-filter: blur(12px);
-  z-index: 1100;
+  z-index: 100005;
   display: none;
   place-items: center;
   padding: 20px;
@@ -2561,55 +2561,55 @@ pre {
         <!-- Rendered dynamically -->
       </div>
     </main>
+  </div> <!-- END .app-layout -->
 
-    <!-- AI TUTOR PANEL -->
-    <aside id="tutorPanel" class="tutor-panel">
-      <div class="tutor-header">
-        <div class="tutor-title-box">
-          <span class="ai-pulse-dot"></span>
-          <strong>Gemini C# Copilot</strong>
+  <!-- AI TUTOR PANEL (FIXED POPUP WIDGET) -->
+  <aside id="tutorPanel" class="tutor-panel">
+    <div class="tutor-header">
+      <div class="tutor-title-box">
+        <span class="ai-pulse-dot"></span>
+        <strong>Gemini C# Copilot</strong>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span id="currentModelBadge" class="tutor-model-badge" title="Đổi model Gemini">gemini-2.5-flash</span>
+        <button id="closeTutorBtn" class="tutor-close-btn" title="Đóng Chat AI">&times;</button>
+      </div>
+    </div>
+
+    <div class="tutor-context-bar">
+      <span>Ngữ cảnh:</span>
+      <strong id="aiLessonContextTitle">OOP: 4 tính chất</strong>
+    </div>
+
+    <div id="chatHistory" class="chat-history">
+      <div class="chat-msg assistant">
+        <div class="chat-bubble">
+          👋 Xin chào! Tôi là <strong>Gemini C# AI Copilot</strong>. Bạn có thể hỏi bất kỳ câu hỏi nào về bài học hiện tại, nhờ giải thích code, review code hoặc bấm các phím tắt bên dưới để học nhanh hơn!
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span id="currentModelBadge" class="tutor-model-badge" title="Đổi model Gemini">gemini-2.5-flash</span>
-          <button id="closeTutorBtn" class="tutor-close-btn" title="Đóng Chat AI">&times;</button>
-        </div>
+        <div class="chat-meta"><span>🤖 Gemini AI System</span></div>
       </div>
+    </div>
 
-      <div class="tutor-context-bar">
-        <span>Ngữ cảnh:</span>
-        <strong id="aiLessonContextTitle">OOP: 4 tính chất</strong>
-      </div>
+    <div class="quick-prompts-bar">
+      <button class="quick-prompt-btn" data-prompt="Giải thích bài này thật ngắn gọn, dễ hiểu như cho Fresher.">💡 Giải thích dễ hiểu</button>
+      <button class="quick-prompt-btn" data-prompt="Cho tôi một ví dụ nghiệp vụ K2POS / Bán lẻ thực tế ứng dụng kiến thức này.">🛒 Ví dụ K2POS</button>
+      <button class="quick-prompt-btn" data-prompt="Hãy review đoạn code trong phần thực hành của tôi và chỉ ra lỗi tiềm ẩn (deadlock, memory, clean code).">🔍 Review Code của tôi</button>
+      <button class="quick-prompt-btn" data-prompt="Hãy đóng vai Tech Lead phỏng vấn tôi 2 câu hỏi hóc búa về chủ đề này.">🎙️ Mock Interview</button>
+    </div>
 
-      <div id="chatHistory" class="chat-history">
-        <div class="chat-msg assistant">
-          <div class="chat-bubble">
-            👋 Xin chào! Tôi là <strong>Gemini C# AI Copilot</strong>. Bạn có thể hỏi bất kỳ câu hỏi nào về bài học hiện tại, nhờ giải thích code, review code hoặc bấm các phím tắt bên dưới để học nhanh hơn!
-          </div>
-          <div class="chat-meta"><span>🤖 Gemini AI System</span></div>
-        </div>
+    <div class="chat-input-section">
+      <textarea id="chatInput" class="chat-textarea" placeholder="Nhập câu hỏi C#... (Nhấn Enter để gửi)"></textarea>
+      <div class="chat-controls">
+        <span class="chat-tip">Shift + Enter xuống dòng</span>
+        <button id="sendChatBtn" class="chat-send-btn">
+          <span>Gửi</span> ➔
+        </button>
       </div>
-
-      <div class="quick-prompts-bar">
-        <button class="quick-prompt-btn" data-prompt="Giải thích bài này thật ngắn gọn, dễ hiểu như cho Fresher.">💡 Giải thích dễ hiểu</button>
-        <button class="quick-prompt-btn" data-prompt="Cho tôi một ví dụ nghiệp vụ K2POS / Bán lẻ thực tế ứng dụng kiến thức này.">🛒 Ví dụ K2POS</button>
-        <button class="quick-prompt-btn" data-prompt="Hãy review đoạn code trong phần thực hành của tôi và chỉ ra lỗi tiềm ẩn (deadlock, memory, clean code).">🔍 Review Code của tôi</button>
-        <button class="quick-prompt-btn" data-prompt="Hãy đóng vai Tech Lead phỏng vấn tôi 2 câu hỏi hóc búa về chủ đề này.">🎙️ Mock Interview</button>
-      </div>
-
-      <div class="chat-input-section">
-        <textarea id="chatInput" class="chat-textarea" placeholder="Nhập câu hỏi C#... (Nhấn Enter để gửi)"></textarea>
-        <div class="chat-controls">
-          <span class="chat-tip">Shift + Enter xuống dòng</span>
-          <button id="sendChatBtn" class="chat-send-btn">
-            <span>Gửi</span> ➔
-          </button>
-        </div>
-      </div>
-    </aside>
-  </div>
+    </div>
+  </aside>
 
   <!-- FLOATING AI CHAT BUBBLE -->
-  <button id="floatingAiBtn" class="floating-ai-btn" title="Mở Trợ lý AI Copilot">
+  <button id="floatingAiBtn" class="floating-ai-btn" type="button" title="Mở Trợ lý AI Copilot">
     <span>💬</span>
     <span class="floating-ai-badge">AI</span>
   </button>
