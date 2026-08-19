@@ -1345,273 +1345,6 @@ pre {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(6, 182, 212, 0.08));
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 14px;
-  font-size: 14.5px;
-  line-height: 1.65;
-  color: #e0e7ff;
-}
-:root[data-theme="light"] .practice-task {
-  color: #1e1b4b;
-}
-.editor-container {
-  display: flex;
-  flex-direction: column;
-  border-radius: 16px;
-  overflow: hidden;
-  border: 1px solid rgba(99, 102, 241, 0.25);
-  box-shadow: var(--shadow);
-}
-.editor-header-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background: #0d121f;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 12.5px;
-  color: #94a3b8;
-  font-weight: 700;
-}
-.editor-textarea {
-  width: 100%;
-  min-height: 250px;
-  background: #04060a;
-  color: #e0e7ff;
-  font-family: 'Fira Code', monospace;
-  font-size: 13.5px;
-  line-height: 1.65;
-  padding: 18px;
-  border: none;
-  outline: none;
-  resize: vertical;
-}
-
-/* TERMINAL WINDOW PRO */
-.terminal-window {
-  display: none;
-  margin-top: 14px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: #030509;
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  box-shadow: 0 0 30px rgba(6, 182, 212, 0.1);
-  animation: fadeIn 0.3s ease;
-}
-.terminal-window.show {
-  display: block;
-}
-.terminal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 18px;
-  background: #090e18;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  font-size: 12px;
-  font-weight: 700;
-  color: #38bdf8;
-}
-.terminal-dots {
-  display: flex;
-  gap: 6px;
-}
-.terminal-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.terminal-dot.red { background: #ef4444; }
-.terminal-dot.yellow { background: #f59e0b; }
-.terminal-dot.green { background: #10b981; }
-.terminal-body {
-  padding: 18px;
-  font-family: 'Fira Code', monospace;
-  font-size: 13px;
-  line-height: 1.65;
-  color: #38bdf8;
-  max-height: 280px;
-  overflow-y: auto;
-  white-space: pre-wrap;
-}
-
-/* BUTTONS PRO */
-.btn-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  padding: 11px 20px;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 13.5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 20px var(--accent-glow);
-}
-.btn-primary:hover {
-  filter: brightness(1.15);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 25px var(--accent-glow);
-}
-.btn-secondary {
-  background: var(--panel-card);
-  border: 1px solid var(--glass-border);
-  color: var(--ink);
-  padding: 11px 18px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 13.5px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.btn-secondary:hover {
-  background: var(--panel-hover);
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-.btn-ghost {
-  background: transparent;
-  color: var(--muted-text);
-  padding: 10px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 13.5px;
-  border: 1px solid transparent;
-}
-.btn-ghost:hover {
-  color: var(--ink);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-/* QUIZ PRO */
-.quiz-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-.quiz-card {
-  padding: 18px 20px;
-  border-radius: 14px;
-  background: rgba(13, 18, 31, 0.5);
-  border: 1px solid var(--glass-border);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-:root[data-theme="light"] .quiz-card {
-  background: #f8fafc;
-}
-.quiz-question {
-  font-size: 15px;
-  font-weight: 700;
-  color: #ffffff;
-}
-:root[data-theme="light"] .quiz-question {
-  color: #0f172a;
-}
-.quiz-options-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-.quiz-opt-btn {
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border);
-  color: var(--ink-soft);
-  text-align: left;
-  font-size: 13.5px;
-  font-weight: 600;
-  line-height: 1.5;
-}
-.quiz-opt-btn:hover:not(:disabled) {
-  background: var(--panel-hover);
-  border-color: var(--accent);
-  color: white;
-  transform: translateY(-2px);
-}
-.quiz-opt-btn.correct {
-  background: rgba(16, 185, 129, 0.2) !important;
-  border-color: #10b981 !important;
-  color: #6ee7b7 !important;
-}
-.quiz-opt-btn.wrong {
-  background: rgba(239, 68, 68, 0.2) !important;
-  border-color: #ef4444 !important;
-  color: #fca5a5 !important;
-}
-.quiz-explain-text {
-  font-size: 13.5px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: rgba(99, 102, 241, 0.08);
-  border-left: 3px solid var(--accent);
-  color: #c7d2fe;
-  display: none;
-}
-.quiz-explain-text.show {
-  display: block;
-}
-
-/* NOTES & FINISH */
-.notes-input {
-  width: 100%;
-  min-height: 110px;
-  padding: 16px;
-  border-radius: 14px;
-  background: rgba(13, 18, 31, 0.7);
-  border: 1px solid var(--glass-border);
-  color: var(--ink);
-  font-size: 14px;
-  line-height: 1.6;
-  outline: none;
-  resize: vertical;
-}
-:root[data-theme="light"] .notes-input {
-  background: #ffffff;
-}
-.notes-input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-.finish-banner {
-  padding: 26px 30px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
-  border: 1px solid rgba(99, 102, 241, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  box-shadow: var(--shadow);
-}
-.finish-info strong {
-  font-size: 17px;
-  color: #ffffff;
-}
-:root[data-theme="light"] .finish-info strong {
-  color: #0f172a;
-}
-.finish-info p {
-  font-size: 13.5px;
-  color: var(--ink-soft);
-  margin-top: 4px;
-}
-.finish-btns {
-  display: flex;
-  gap: 10px;
-}
-
-/* AI TUTOR PANEL PRO */
-.tutor-panel {
   background: var(--glass);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
@@ -2030,7 +1763,7 @@ pre {
       </div>
       <div style="display: flex; align-items: center; gap: 8px;">
         <span id="currentModelBadge" class="tutor-model-badge" title="Đổi model Gemini">gemini-2.5-flash</span>
-        <button id="closeTutorBtn" class="tutor-close-btn" title="Đóng Chat AI">&times;</button>
+        <button id="closeTutorBtn" class="tutor-close-btn" type="button" onclick="window.closeAiChatWidget(event)" title="Đóng Chat AI">&times;</button>
       </div>
     </div>
 
@@ -2067,7 +1800,7 @@ pre {
   </aside>
 
   <!-- FLOATING AI CHAT BUBBLE -->
-  <button id="floatingAiBtn" class="floating-ai-btn" type="button" title="Mở Trợ lý AI Copilot">
+  <button id="floatingAiBtn" class="floating-ai-btn" type="button" onclick="window.toggleAiChatWidget(event)" title="Mở Trợ lý AI Copilot">
     <span>💬</span>
     <span class="floating-ai-badge">AI</span>
   </button>
@@ -4490,20 +4223,48 @@ async function copyToClipboard(text) {
 }
 
 /* ==========================================================================
+   GLOBAL CHATBOT WIDGET CONTROLLERS
+   ========================================================================== */
+window.toggleAiChatWidget = function(e) {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  const panel = document.getElementById("tutorPanel");
+  if (panel) {
+    panel.classList.toggle("open");
+  }
+};
+
+window.closeAiChatWidget = function(e) {
+  if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+  const panel = document.getElementById("tutorPanel");
+  if (panel) {
+    panel.classList.remove("open");
+  }
+};
+
+/* ==========================================================================
    GEMINI API MULTI-KEY ROTATION & CHATBOT ENGINE
    ========================================================================== */
 function parseApiKeysFromText(text) {
   const rawList = text.split(/[\n,;]+/).map(k => k.trim()).filter(k => k.length > 10);
-  // Remove duplicates
   const uniqueKeys = [...new Set(rawList)];
-  return uniqueKeys.map(k => {
-    const existing = state.apiKeys.find(e => e.key === k);
-    return existing || { key: k, status: 'ready', cooldownUntil: 0, successCount: 0 };
-  });
+  return uniqueKeys.map(k => ({
+    key: k,
+    status: 'ready',
+    cooldownUntil: 0,
+    successCount: 0
+  }));
 }
 
 function updateKeyStatusUI() {
-  const activeKeys = state.apiKeys.filter(k => k.status === 'ready' || (k.status === 'cooldown' && Date.now() > k.cooldownUntil));
+  // Auto unfreeze expired cooldowns
+  const now = Date.now();
+  state.apiKeys.forEach(k => {
+    if (k.status === 'cooldown' && now >= k.cooldownUntil) {
+      k.status = 'ready';
+    }
+  });
+
+  const activeKeys = state.apiKeys.filter(k => k.status === 'ready');
   const total = state.apiKeys.length;
 
   if (total === 0) {
@@ -4513,8 +4274,13 @@ function updateKeyStatusUI() {
     el.keyStatusDot.className = "key-status-dot active";
     el.keyStatusLabel.textContent = `AI Keys: ${activeKeys.length}/${total} Sẵn sàng`;
   } else {
-    el.keyStatusDot.className = "key-status-dot error";
-    el.keyStatusLabel.textContent = `AI Keys: Tất cả đang Cooldown`;
+    // Tự động khôi phục nếu tất cả bị kẹt cooldown
+    state.apiKeys.forEach(k => {
+      k.status = 'ready';
+      k.cooldownUntil = 0;
+    });
+    el.keyStatusDot.className = "key-status-dot active";
+    el.keyStatusLabel.textContent = `AI Keys: ${total}/${total} Sẵn sàng`;
   }
 
   el.currentModelBadge.textContent = state.selectedModel;
@@ -4567,10 +4333,19 @@ function getNextAvailableKey() {
     }
   });
 
-  const availableIndices = [];
+  let availableIndices = [];
   state.apiKeys.forEach((k, idx) => {
     if (k.status === 'ready') availableIndices.push(idx);
   });
+
+  // Nếu không còn key nào ready (bị kẹt), tự động unlock tất cả key để thử lại
+  if (availableIndices.length === 0 && state.apiKeys.length > 0) {
+    state.apiKeys.forEach(k => {
+      k.status = 'ready';
+      k.cooldownUntil = 0;
+    });
+    availableIndices = state.apiKeys.map((_, i) => i);
+  }
 
   if (availableIndices.length === 0) return null;
 
