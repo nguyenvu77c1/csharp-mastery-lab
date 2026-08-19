@@ -2767,6 +2767,67 @@ pre, code, pre[class*="language-"] {
   box-sizing: border-box !important;
 }
 
+
+/* ── KEY TEST RESULT FEEDBACK BOX ── */
+.key-test-result-box {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.2s ease;
+}
+.key-test-result-box.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+.key-test-result-box.error {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.4);
+  color: #fca5a5;
+}
+.key-test-result-box.warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fde047;
+}
+.key-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12.5px;
+  gap: 8px;
+}
+.key-status-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.key-status-badge.ready {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.key-status-badge.error {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+.key-status-badge.cooldown {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
 </style>
 </head>
 <body>
@@ -2966,6 +3027,8 @@ pre, code, pre[class*="language-"] {
           <strong style="font-size: 13px;">Trạng thái các Keys đã lưu:</strong>
           <div id="keyStatusList" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
+      
+        <div id="keyTestFeedbackBox" style="display: none;"></div>
       </div>
       <div class="modal-footer">
         <button id="testKeysBtn" class="btn-secondary">⚡ Kiểm tra tất cả Keys</button>
@@ -6838,8 +6901,8 @@ function parseApiKeysFromText(text) {
   }));
 }
 
+
 function updateKeyStatusUI() {
-  // Auto unfreeze expired cooldowns
   const now = Date.now();
   state.apiKeys.forEach(k => {
     if (k.status === 'cooldown' && now >= k.cooldownUntil) {
@@ -6847,484 +6910,171 @@ function updateKeyStatusUI() {
     }
   });
 
-  const activeKeys = state.apiKeys.filter(k => k.status === 'ready');
   const total = state.apiKeys.length;
+  const ready = state.apiKeys.filter(k => k.status === 'ready').length;
+  const cooldown = state.apiKeys.filter(k => k.status === 'cooldown').length;
+  const error = state.apiKeys.filter(k => k.status === 'error' || k.status === 'invalid').length;
+
+  const dot = $("keyStatusDot");
+  const label = $("keyStatusLabel");
+  const sideSub = $("sidebarKeySubtitle");
 
   if (total === 0) {
-    el.keyStatusDot.className = "key-status-dot";
-    el.keyStatusLabel.textContent = "AI Key: Chưa có";
-  } else if (activeKeys.length > 0) {
-    el.keyStatusDot.className = "key-status-dot active";
-    el.keyStatusLabel.textContent = `AI Keys: ${activeKeys.length}/${total} Sẵn sàng`;
+    if (dot) dot.className = "key-status-dot empty";
+    if (label) label.textContent = "🔑 Nhập Key AI";
+    if (sideSub) sideSub.textContent = "⚠️ Chưa có Key • Bấm để nhập";
+  } else if (ready > 0) {
+    if (dot) dot.className = "key-status-dot active ready";
+    if (label) label.textContent = `🔑 ${ready}/${total} Key Sẵn sàng`;
+    if (sideSub) sideSub.textContent = `✅ ${ready}/${total} Key sẵn sàng (${state.selectedModel})`;
+  } else if (cooldown > 0) {
+    if (dot) dot.className = "key-status-dot cooldown";
+    if (label) label.textContent = `⏳ ${cooldown} Key Cooldown`;
+    if (sideSub) sideSub.textContent = `⏳ ${cooldown} Key đang làm nguội...`;
   } else {
-    // Tự động khôi phục nếu tất cả bị kẹt cooldown
-    state.apiKeys.forEach(k => {
-      k.status = 'ready';
-      k.cooldownUntil = 0;
-    });
-    el.keyStatusDot.className = "key-status-dot active";
-    el.keyStatusLabel.textContent = `AI Keys: ${total}/${total} Sẵn sàng`;
+    if (dot) dot.className = "key-status-dot error";
+    if (label) label.textContent = `❌ ${error} Key Lỗi`;
+    if (sideSub) sideSub.textContent = "❌ Key bị lỗi • Bấm để kiểm tra lại";
   }
 
-  el.currentModelBadge.textContent = state.selectedModel;
+  if (el.currentModelBadge) {
+    el.currentModelBadge.textContent = state.selectedModel;
+  }
 
-  // Render list inside modal
-  if (el.keyStatusList) {
-    if (state.apiKeys.length === 0) {
-      el.keyStatusList.innerHTML = `<div style="color: var(--muted); font-size: 12px; padding: 6px;">Chưa có API key nào được lưu.</div>`;
-    } else {
-      el.keyStatusList.innerHTML = state.apiKeys.map((k, idx) => {
-        const masked = k.key.slice(0, 8) + "..." + k.key.slice(-4);
-        const isCooldown = k.status === 'cooldown' && Date.now() < k.cooldownUntil;
-        let badgeClass = 'ready';
-        let badgeText = `Sẵn sàng (${k.successCount || 0} calls)`;
+  // Render Key List in Modal
+  renderKeyStatusList();
+}
 
-        if (k.status === 'error') {
-          badgeClass = 'error';
-          badgeText = 'Lỗi / Hết hạn';
-        } else if (isCooldown) {
-          badgeClass = 'cooldown';
-          const remainSec = Math.round((k.cooldownUntil - Date.now()) / 1000);
-          badgeText = `429 Cooldown (${remainSec}s)`;
-        }
+function renderKeyStatusList() {
+  const listEl = $("keyStatusList");
+  if (!listEl) return;
 
-        return `
-          <div class="key-item-row">
-            <span>${idx + 1}.</span>
-            <span>${masked}</span>
-            <span class="key-status-badge ${badgeClass}">${badgeText}</span>
-            <button class="btn-ghost" style="padding: 2px 8px; font-size: 11px;" onclick="deleteApiKey(${idx})">Xóa</button>
-          </div>
-        `;
-      }).join("");
+  if (state.apiKeys.length === 0) {
+    listEl.innerHTML = `<div style="color: var(--muted-text); font-size: 12.5px; padding: 6px;">Chưa có API key nào được lưu. Hãy dán key của bạn vào ô trên!</div>`;
+    return;
+  }
+
+  listEl.innerHTML = state.apiKeys.map((k, idx) => {
+    const masked = k.key.length > 10 ? (k.key.slice(0, 8) + "..." + k.key.slice(-4)) : k.key;
+    const isCooldown = k.status === 'cooldown' && Date.now() < k.cooldownUntil;
+    let badgeClass = 'ready';
+    let badgeText = `✅ Sẵn sàng (${k.successCount || 0} calls)`;
+
+    if (k.status === 'error' || k.status === 'invalid') {
+      badgeClass = 'error';
+      badgeText = '❌ Key lỗi / Không hợp lệ';
+    } else if (isCooldown) {
+      badgeClass = 'cooldown';
+      const remainSec = Math.max(1, Math.round((k.cooldownUntil - Date.now()) / 1000));
+      badgeText = `⏳ 429 Rate limit (${remainSec}s)`;
     }
-  }
+
+    return `
+      <div class="key-item-row">
+        <span style="font-weight: 700; color: var(--ink);">${idx + 1}.</span>
+        <code style="font-size: 12px; color: #cbd5e1;">${masked}</code>
+        <span class="key-status-badge ${badgeClass}">${badgeText}</span>
+        <button class="btn-ghost" style="padding: 3px 8px; font-size: 11px; margin-left: auto; color: #f87171;" onclick="deleteApiKey(${idx})">✕ Xóa</button>
+      </div>
+    `;
+  }).join("");
 }
 
 window.deleteApiKey = function(idx) {
   state.apiKeys.splice(idx, 1);
   saveState();
-  
-  // BIND SIDEBAR KEY CARD
-  const sideKeyCard = $("sidebarKeyCard");
-  if (sideKeyCard) sideKeyCard.onclick = () => openKeyModal();
-
-  // BIND MISSING KEY HERO BANNER
-  window.openKeyModal = () => {
-    $("keyModal").classList.add("open");
-    $("apiKeyTextarea").value = state.apiKeys.map(k => k.key).join("\n");
-    renderKeyStatusList();
-  };
-
-  // BIND SIDEBAR TOOLS
-  const sRoadmap = $("sidebarRoadmapBtn");
-  if (sRoadmap) sRoadmap.onclick = () => {
-    $("roadmapModal").classList.add("open");
-    if (window.innerWidth <= 900) {
-      $("sidebar").classList.remove("open");
-      $("sidebarBackdrop").classList.remove("open");
-    }
-  };
-  const sCheat = $("sidebarCheatSheetBtn");
-  if (sCheat) sCheat.onclick = () => {
-    $("cheatSheetModal").classList.add("open");
-    if (window.innerWidth <= 900) {
-      $("sidebar").classList.remove("open");
-      $("sidebarBackdrop").classList.remove("open");
-    }
-  };
-  const sExp = $("sidebarExportBtn");
-  if (sExp) sExp.onclick = () => $("exportDataBtn") && $("exportDataBtn").click();
-  const sImp = $("sidebarImportBtn");
-  if (sImp) sImp.onclick = () => $("importDataBtn") && $("importDataBtn").click();
-
   updateKeyStatusUI();
+  const box = $("keyTestFeedbackBox");
+  if (box) box.style.display = 'none';
+  showToast("Đã xóa API Key khỏi danh sách!", "🗑️");
 };
-
-function getNextAvailableKey() {
-  const now = Date.now();
-  // Auto recover cooled down keys
-  state.apiKeys.forEach(k => {
-    if (k.status === 'cooldown' && now >= k.cooldownUntil) {
-      k.status = 'ready';
-    }
-  });
-
-  let availableIndices = [];
-  state.apiKeys.forEach((k, idx) => {
-    if (k.status === 'ready') availableIndices.push(idx);
-  });
-
-  // Nếu không còn key nào ready (bị kẹt), tự động unlock tất cả key để thử lại
-  if (availableIndices.length === 0 && state.apiKeys.length > 0) {
-    state.apiKeys.forEach(k => {
-      k.status = 'ready';
-      k.cooldownUntil = 0;
-    });
-    availableIndices = state.apiKeys.map((_, i) => i);
-  }
-
-  if (availableIndices.length === 0) return null;
-
-  // Round-robin selection
-  state.currentKeyIndex = (state.currentKeyIndex + 1) % availableIndices.length;
-  const chosenIndex = availableIndices[state.currentKeyIndex];
-  return { keyObj: state.apiKeys[chosenIndex], index: chosenIndex };
-}
-
-function markKeyCooldown(keyObj, seconds = 60) {
-  keyObj.status = 'cooldown';
-  keyObj.cooldownUntil = Date.now() + seconds * 1000;
-  saveState();
-  updateKeyStatusUI();
-}
-
-function markKeyError(keyObj) {
-  keyObj.status = 'error';
-  saveState();
-  updateKeyStatusUI();
-}
-
-function markKeySuccess(keyObj) {
-  keyObj.status = 'ready';
-  keyObj.successCount = (keyObj.successCount || 0) + 1;
-  saveState();
-  updateKeyStatusUI();
-}
-
-/* ==========================================================================
-   OFFLINE KNOWLEDGE BASE (FALLBACK WHEN NO KEYS)
-   ========================================================================== */
-function getOfflineAiResponse(question, lesson) {
-  const q = question.toLowerCase();
-  const pairs = [
-    [["oop", "đóng gói", "encapsulation"], "Encapsulation (Đóng gói) giúp đối tượng tự kiểm soát quy tắc nội tại (ví dụ: `private set` cho Quantity, chỉ tăng qua `IncreaseQuantity()`)."],
-    [["interface", "abstract", "kế thừa"], "Interface là hợp đồng năng lực (Can-Do) cho nhiều đối tượng khác loại; Abstract class là quan hệ gia đình (Is-A) có thể chia sẻ mã nguồn."],
-    [["override", "new"], "`override` tham gia đa hình vtable thực sự; `new` chỉ là method hiding theo kiểu biến khai báo."],
-    [["async", "await", "deadlock", "result", "wait"], "Luôn dùng `await`, tránh `.Result` hay `.Wait()` vì chúng gây Deadlock trên UI Thread và nghẽn ThreadPool."],
-    [["whenall", "whenany", "cancellation", "token"], "`Task.WhenAll` khởi động nhiều task I/O độc lập song song; `CancellationToken` phải truyền xuyên suốt để hủy kịp thời."],
-    [["di", "scoped", "singleton", "transient", "captive"], "Transient tạo mới mỗi lần; Scoped tạo 1 lần/HTTP Request; Singleton 1 lần duy nhất. Cấm inject Scoped (DbContext) vào Singleton!"],
-    [["ef", "asnotracking", "n+1", "n + 1", "include"], "`AsNoTracking` tối ưu truy vấn chỉ đọc; N+1 giải quyết bằng `.Include()` hoặc Projection `.Select()`."],
-    [["span", "memory", "zero allocation"], "`Span<T>` là ref struct trên Stack giúp cắt mảng/chuỗi không tốn byte rác nào trên Heap."],
-    [["semantic kernel", "function calling", "rag"], "Function Calling cho phép AI yêu cầu chạy hàm C# lấy số liệu thật; RAG dùng Vector DB tìm tài liệu liên quan đính kèm vào Prompt."]
-  ];
-
-  for (const [keys, ans] of pairs) {
-    if (keys.some(k => q.includes(k))) {
-      return `💡 **[Chế độ Offline]** ${ans}\n\n*Để trò chuyện sâu hơn và sinh code tự động, hãy thêm Gemini API Key ở góc trên bên phải!*`;
-    }
-  }
-
-  return `🤖 Bạn đang hỏi về: **${question}** trong bài học **${lesson.title}**.\n\n*Gợi ý:* Hãy nhập ít nhất 1 **Gemini API Key** (nút màu tím trên thanh công cụ) để mở khóa toàn bộ sức mạnh AI giải thích chi tiết, review code và tạo bài tập tương tác!`;
-}
-
-/* ==========================================================================
-   CALL GEMINI API (WITH SMART MULTI-KEY ROTATION, AUTO-RETRY & MULTI-MODEL FALLBACK)
-   ========================================================================== */
-let lastFailedPrompt = "";
-
-async function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function callGeminiApi(promptText, currentLesson) {
-  lastFailedPrompt = promptText;
-
-  // Lấy danh sách model hợp lệ theo thứ tự ưu tiên
-  const candidateModels = [
-    state.selectedModel || "gemini-2.5-flash",
-    "gemini-2.5-flash",
-    "gemini-1.5-flash-latest",
-    "gemini-2.5-pro",
-    "gemini-3.6-flash"
-  ];
-  const modelsToTry = [...new Set(candidateModels)];
-
-  // Lấy code hiện tại trong editor
-  const currentEditorCode = $("practiceCodeEditor") ? $("practiceCodeEditor").value.trim() : "";
-
-  const systemInstructionText = `Bạn là Giảng viên C# & .NET kiêm Chuyên gia Khai phóng Năng lực Lập trình C# xuất sắc.
-HỌC VIÊN CỦA BẠN: Là lập trình viên đang chuyển từ "Vibe Coding" sang học và làm chủ C# thuần từ con số 0.
-BÀI HỌC HIỆN TẠI: "${currentLesson.title}" (Module: ${currentLesson.module}).
-- Mục tiêu: ${currentLesson.goals.join("; ")}
-- Tóm tắt cốt lõi: ${currentLesson.explain.join("; ")}
-- Ví dụ đời thực: ${currentLesson.analogy}
-${currentEditorCode ? `- Đoạn Code học viên đang mở trong Editor:\n\`\`\`csharp\n${currentEditorCode}\n\`\`\`` : ''}
-
-NGUYÊN TẮC GIẢNG BÀI:
-1. Giải thích CỰC KỲ CƠ BẢN, CHI TIẾT, BÓC TÁCH TỪNG TỪ KHÓA cú pháp C#.
-2. Luôn liên hệ ví dụ đời thường và nghiệp vụ thực tế (Bán hàng, K2POS, Đơn hàng).
-3. Chỉ ra bản chất bên dưới (Stack / Heap / CPU / CLR).
-4. Trả lời bằng tiếng Việt thân thiện, Markdown đẹp mắt, chuẩn Clean Code.`;
-
-  // Chuẩn bị payload history
-  const historyContents = [];
-  const recentHistory = state.chatHistory.slice(-6);
-  for (const h of recentHistory) {
-    historyContents.push({
-      role: h.role === 'user' ? 'user' : 'model',
-      parts: [{ text: h.text }]
-    });
-  }
-  historyContents.push({
-    role: "user",
-    parts: [{ text: promptText }]
-  });
-
-  const availableKeys = state.apiKeys.filter(k => k.status !== 'error');
-  if (availableKeys.length === 0) {
-    return { 
-      ok: false, 
-      mode: 'offline', 
-      text: `⚠️ **Chưa có API Key hợp lệ nào!**\n\nBạn hãy bấm vào nút **\`AI Key\`** ở góc trên bên phải để thêm API Key Gemini mới. Nếu bạn vừa tạo key, hãy dán vào ô và bấm **Lưu cấu hình** nhé!\n\n---\n\n${getOfflineAiResponse(promptText, currentLesson)}` 
-    };
-  }
-
-  let lastErrorDetail = "";
-
-  for (const model of modelsToTry) {
-    let keyInfo = getNextAvailableKey();
-    if (!keyInfo) break;
-
-    const { keyObj } = keyInfo;
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyObj.key}`;
-
-    // Auto-retry tối đa 2 lần cho mỗi model nếu máy chủ Google quá tải (503 / 429)
-    for (let retry = 0; retry < 2; retry++) {
-      try {
-        const payload = {
-          system_instruction: {
-            parts: [{ text: systemInstructionText }]
-          },
-          contents: historyContents,
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2500
-          }
-        };
-
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        if (res.status === 503 || res.status === 500) {
-          console.warn(`Model ${model} đang quá tải (Status ${res.status}). Đang tự động thử lại lần ${retry + 1}...`);
-          lastErrorDetail = `Máy chủ Google đang quá tải (${res.status})`;
-          await sleep(1000 * (retry + 1));
-          continue;
-        }
-
-        if (res.status === 429) {
-          console.warn(`Key ${keyObj.key.slice(0, 8)} bị 429 Quota Exceeded. Đang xoay vòng sang key tiếp theo...`);
-          markKeyCooldown(keyObj, 60);
-          lastErrorDetail = "429: Hết hạn mức request (Quota Exceeded)";
-          break; // Đổi sang model / key tiếp theo
-        }
-
-        if (res.status === 403) {
-          const errJson = await res.json().catch(() => ({}));
-          const msg = errJson.error?.message || "Permission Denied / Leaked Key";
-          console.error(`Key ${keyObj.key.slice(0, 8)} bị 403:`, msg);
-          markKeyError(keyObj);
-          lastErrorDetail = `403: ${msg}`;
-          break; // Bỏ qua key bị lỗi
-        }
-
-        if (res.status === 404) {
-          console.warn(`Model ${model} không khả dụng (404). Chuyển sang model tiếp theo...`);
-          lastErrorDetail = `404: Model ${model} không khả dụng`;
-          break;
-        }
-
-        if (!res.ok) {
-          // Thử lại dạng fallback payload
-          const fallbackPayload = {
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: `[HƯỚNG DẪN HỆ THỐNG]:\n${systemInstructionText}\n\n[CÂU HỎI]:\n${promptText}` }]
-              }
-            ]
-          };
-
-          const resFallback = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(fallbackPayload)
-          });
-
-          if (resFallback.ok) {
-            const dataFallback = await resFallback.json();
-            const generatedText = dataFallback.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (generatedText) {
-              state.selectedModel = model;
-              localStorage.setItem("csharp_gemini_model", model);
-              state.chatHistory.push({ role: 'user', text: promptText });
-              state.chatHistory.push({ role: 'model', text: generatedText });
-              markKeySuccess(keyObj);
-              return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
-            }
-          }
-
-          const errData = await res.json().catch(() => ({}));
-          lastErrorDetail = `HTTP ${res.status}: ${errData.error?.message || 'Lỗi kết nối'}`;
-          continue;
-        }
-
-        const data = await res.json();
-        const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi từ AI.";
-
-        // Cập nhật model thành công
-        state.selectedModel = model;
-        localStorage.setItem("csharp_gemini_model", model);
-
-        state.chatHistory.push({ role: 'user', text: promptText });
-        state.chatHistory.push({ role: 'model', text: generatedText });
-
-        markKeySuccess(keyObj);
-        return { ok: true, mode: 'online', keyMasked: keyObj.key.slice(0, 6) + "...", text: generatedText };
-      } catch (err) {
-        console.error("Gemini API call network error:", err);
-        lastErrorDetail = "Rớt kết nối mạng hoặc timeout";
-        await sleep(800);
-      }
-    }
-  }
-
-  return { 
-    ok: false, 
-    mode: 'offline', 
-    text: `⚠️ **Máy chủ AI đang tạm thời quá tải hoặc bận (${lastErrorDetail || 'Lỗi kết nối'})**\n\n<div style="margin-top: 10px;"><button class="btn-primary" style="padding: 6px 14px; font-size: 12px;" onclick="window.retryLastChat()">🔄 Bấm vào đây để thử gửi lại ngay</button></div>\n\n---\n\n${getOfflineAiResponse(promptText, currentLesson)}` 
-  };
-}
-
-/* ==========================================================================
-   CHATBOT UI INTERACTIONS
-   ========================================================================== */
-window.retryLastChat = function() {
-  if (lastFailedPrompt) {
-    sendChatMessage(lastFailedPrompt);
-  }
-};
-
-function appendChatMessage(role, text, metaInfo = "") {
-  const msgEl = document.createElement("div");
-  msgEl.className = `chat-msg ${role}`;
-
-  const bubble = document.createElement("div");
-  bubble.className = "chat-bubble";
-
-  if (role === "assistant" && window.marked) {
-    bubble.innerHTML = marked.parse(text);
-  } else {
-    bubble.textContent = text;
-  }
-
-  const meta = document.createElement("div");
-  meta.className = "chat-meta";
-  meta.textContent = metaInfo || (role === "user" ? "Bạn" : "Gemini Copilot");
-
-  msgEl.appendChild(bubble);
-  msgEl.appendChild(meta);
-
-  el.chatHistory.appendChild(msgEl);
-  el.chatHistory.scrollTop = el.chatHistory.scrollHeight;
-
-  return msgEl;
-}
-
-async function sendChatMessage(overridePrompt) {
-  const text = (overridePrompt || el.chatInput.value).trim();
-  if (!text) return;
-
-  // Luôn mở cửa sổ chat pop-up khi có tương tác AI
-  if (el.tutorPanel) {
-    el.tutorPanel.classList.add("open");
-  }
-
-  appendChatMessage("user", text, "Bạn");
-  el.chatInput.value = "";
-
-  const loadingMsg = appendChatMessage("assistant", "Đang phân tích và xử lý theo ngữ cảnh bài học...", "⏳ Đang kết nối Gemini...");
-  const currentLesson = getCurrentLesson();
-
-  const result = await callGeminiApi(text, currentLesson);
-
-  loadingMsg.remove();
-
-  if (result.mode === 'online') {
-    appendChatMessage("assistant", result.text, `🤖 Gemini • Key [${result.keyMasked}]`);
-  } else {
-    appendChatMessage("assistant", result.text, `⚡ Trợ lý C#`);
-  }
-}
-
-/* ==========================================================================
-   KEY MODAL LOGIC
-   ========================================================================== */
-function openKeyModal() {
-  el.apiKeyTextarea.value = state.apiKeys.map(k => k.key).join("\n");
-  el.modelSelect.value = state.selectedModel;
-  updateKeyStatusUI();
-  el.keyModal.classList.add("open");
-}
-
-function closeKeyModal() {
-  el.keyModal.classList.remove("open");
-}
-
-function saveKeyModal() {
-  const rawText = el.apiKeyTextarea.value;
-  state.apiKeys = parseApiKeysFromText(rawText);
-  state.selectedModel = el.modelSelect.value;
-  saveState();
-  updateKeyStatusUI();
-  closeKeyModal();
-}
 
 async function testAllKeys() {
-  const rawText = el.apiKeyTextarea.value;
-  state.apiKeys = parseApiKeysFromText(rawText);
+  const rawText = el.apiKeyTextarea.value.trim();
+  const parsedKeys = parseApiKeysFromText(rawText);
+
+  const fbBox = $("keyTestFeedbackBox");
+  if (fbBox) {
+    fbBox.style.display = 'none';
+    fbBox.className = 'key-test-result-box';
+  }
+
+  if (parsedKeys.length === 0) {
+    showToast("Vui lòng dán ít nhất 1 API Key vào ô nhập!", "⚠️");
+    if (fbBox) {
+      fbBox.style.display = 'flex';
+      fbBox.className = 'key-test-result-box error';
+      fbBox.innerHTML = '<strong>❌ Chưa có Key:</strong> Vui lòng dán API Key vào ô phía trên rồi bấm Kiểm tra.';
+    }
+    return;
+  }
+
+  state.apiKeys = parsedKeys;
   el.testKeysBtn.disabled = true;
-  el.testKeysBtn.textContent = "Đang kiểm tra...";
+  el.testKeysBtn.textContent = "⏳ Đang gửi request test tới Google Gemini...";
 
-  const modelsToTest = [state.selectedModel || "gemini-2.5-flash", "gemini-2.5-flash", "gemini-1.5-flash-latest", "gemini-2.5-pro"];
+  const selectedModel = el.modelSelect.value || state.selectedModel || "gemini-2.5-flash";
+  const results = [];
 
-  for (const k of state.apiKeys) {
-    let keyWorking = false;
-    for (const m of [...new Set(modelsToTest)]) {
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${k.key}`;
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: "Hello" }] }] })
+  for (let i = 0; i < state.apiKeys.length; i++) {
+    const k = state.apiKeys[i];
+    const keyPrefix = k.key.substring(0, 6);
+    const maskedKey = k.key.length > 10 ? (k.key.substring(0, 8) + '...' + k.key.slice(-4)) : k.key;
+    const isStandardFormat = k.key.startsWith("AIzaSy");
+
+    try {
+      const startTime = performance.now();
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${k.key}`;
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: "Hello" }] }]
+        })
+      });
+
+      const responseTime = Math.round(performance.now() - startTime);
+
+      if (res.ok) {
+        k.status = 'ready';
+        k.cooldownUntil = 0;
+        results.push({
+          key: maskedKey,
+          status: 'success',
+          msg: `Key #${i+1} (${maskedKey}): ✅ HỢP LỆ! Model ${selectedModel} phản hồi thành công trong ${responseTime}ms.`
         });
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        const errMsg = errData.error?.message || `HTTP Status ${res.status}`;
 
-        if (res.ok) {
-          k.status = 'ready';
-          k.cooldownUntil = 0;
-          state.selectedModel = m;
-          el.modelSelect.value = m;
-          keyWorking = true;
-          break;
-        } else if (res.status === 429) {
+        if (res.status === 429) {
           k.status = 'cooldown';
           k.cooldownUntil = Date.now() + 60000;
-          keyWorking = true;
-          break;
-        } else if (res.status === 403) {
+          results.push({
+            key: maskedKey,
+            status: 'warning',
+            msg: `Key #${i+1} (${maskedKey}): ⏳ Key đúng nhưng đang bị 429 Quota Exceeded (Hết lượt gọi miễn phí trong phút này). Hệ thống sẽ tự làm nguội.`
+          });
+        } else {
           k.status = 'error';
-          break;
+          let hint = '';
+          if (!isStandardFormat) {
+            hint = `<br>⚠️ <em>Lưu ý quan trọng:</em> Key của bạn bắt đầu bằng "<code>${keyPrefix}</code>". Gemini API Key chuẩn từ Google AI Studio luôn bắt đầu bằng chữ "<code>AIzaSy...</code>". Hãy vào <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #67e8f9; text-decoration: underline;">Google AI Studio</a> để lấy đúng API Key!`;
+          }
+          results.push({
+            key: maskedKey,
+            status: 'error',
+            msg: `Key #${i+1} (${maskedKey}): ❌ KHÔNG DÙNG ĐƯỢC! Lỗi từ Google: <strong>${escapeHtml(errMsg)}</strong>${hint}`
+          });
         }
-      } catch {
-        k.status = 'error';
       }
-    }
-    if (!keyWorking && k.status !== 'cooldown') {
+    } catch (err) {
       k.status = 'error';
+      results.push({
+        key: maskedKey,
+        status: 'error',
+        msg: `Key #${i+1} (${maskedKey}): ❌ Lỗi kết nối mạng: ${escapeHtml(err.message)}`
+      });
     }
   }
 
@@ -7332,7 +7082,37 @@ async function testAllKeys() {
   updateKeyStatusUI();
   el.testKeysBtn.disabled = false;
   el.testKeysBtn.textContent = "⚡ Kiểm tra tất cả Keys";
+
+  // Display rich feedback in modal
+  if (fbBox) {
+    fbBox.style.display = 'flex';
+    const hasSuccess = results.some(r => r.status === 'success');
+    const hasError = results.some(r => r.status === 'error');
+
+    if (hasSuccess && !hasError) {
+      fbBox.className = 'key-test-result-box success';
+    } else if (hasError) {
+      fbBox.className = 'key-test-result-box error';
+    } else {
+      fbBox.className = 'key-test-result-box warning';
+    }
+
+    fbBox.innerHTML = `
+      <div style="font-weight: 800; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+        📊 KẾT QUẢ KIỂM TRA API KEY (Model: ${selectedModel}):
+      </div>
+      ${results.map(r => `<div style="font-size: 12px; margin-top: 2px;">${r.msg}</div>`).join('')}
+    `;
+  }
+
+  const successCount = results.filter(r => r.status === 'success').length;
+  if (successCount > 0) {
+    showToast(`✅ Đã kiểm tra: ${successCount}/${results.length} Key hoạt động tốt!`, "🎉");
+  } else {
+    showToast("❌ Không có Key nào hợp lệ. Vui lòng xem chi tiết lỗi bên dưới!", "⚠️");
+  }
 }
+
 
 /* ==========================================================================
    EXPORT / IMPORT & RESET
